@@ -12,12 +12,14 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   // Variablen
+  late final MapController _mapController;
   LatLng? _currentLocation;
 
   // Bei Initierung der Seite
   @override
   void initState() {
     super.initState();
+    _mapController = MapController();
     _loadLocation();
   }
 
@@ -28,6 +30,7 @@ class _MapPageState extends State<MapPage> {
       setState(() {
         _currentLocation = location;
       });
+      _mapController.move(location, 12);
     }
   }
 
@@ -36,6 +39,7 @@ class _MapPageState extends State<MapPage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: FlutterMap(
+        mapController: _mapController,
         options: MapOptions(
           initialCenter: _currentLocation ?? LatLng(52.5200, 13.4050),
           initialZoom: 12,
@@ -44,6 +48,8 @@ class _MapPageState extends State<MapPage> {
           TileLayer(
             urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             userAgentPackageName: 'com.example.map_page',
+            tileSize: 512,
+            retinaMode: true,
           ),
           MarkerLayer(
             markers: [
