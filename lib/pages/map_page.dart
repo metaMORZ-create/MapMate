@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:map_mates/services/location_service.dart";
 import "package:flutter/material.dart";
 import "package:flutter_map/flutter_map.dart";
@@ -14,24 +16,35 @@ class _MapPageState extends State<MapPage> {
   // Variablen
   late final MapController _mapController;
   LatLng? _currentLocation;
+  LatLng? _lastMovedLocation;
+  StreamSubscription<LatLng>? _locationSub;
 
   // Bei Initierung der Seite
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
-    _loadLocation();
+    _startTracking();
   }
 
   // Funktion zum abrufen der Location
-  Future<void> _loadLocation() async {
-    LatLng? location = await LocationService.getCurrentLocation();
-    if (location != null) {
+  void _startTracking() {
+    _locationSub = LocationService.getLocationStream().listen((LatLng pos) {
       setState(() {
-        _currentLocation = location;
+        _currentLocation = pos;
       });
-      _mapController.move(location, 12);
-    }
+       if (_lastMovedLocation == null ||
+        const Distance().as(LengthUnit.Meter, _lastMovedLocation!, pos) > 30) {
+        _mapController.move(pos, _mapController.camera.zoom);
+        _lastMovedLocation = pos;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _locationSub?.cancel();
+    super.dispose();
   }
 
   @override
