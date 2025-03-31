@@ -1,4 +1,4 @@
-name: MapMates
+name: map_mates
 description: "A App to share Location with friends, discover Maps and Share Locations"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -39,6 +39,7 @@ dependencies:
   flutter_map: ^6.2.1
   latlong2: ^0.9.1
   geolocator: ^11.1.0 
+  permission_handler: ^11.3.0  
 
 dev_dependencies:
   flutter_test:

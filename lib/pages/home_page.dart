@@ -1,7 +1,7 @@
-import "package:e_commerce_app/components/bottom_navigation_bar.dart";
-import "package:e_commerce_app/pages/map_page.dart";
-import "package:e_commerce_app/pages/settings_page.dart";
-import "package:e_commerce_app/pages/profiles_page.dart";
+import "package:map_mates/components/bottom_navigation_bar.dart";
+import "package:map_mates/pages/map_page.dart";
+import "package:map_mates/pages/settings_page.dart";
+import "package:map_mates/pages/profiles_page.dart";
 import "package:flutter/material.dart";
 
 class HomePage extends StatefulWidget {

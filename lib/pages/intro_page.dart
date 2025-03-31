@@ -1,4 +1,4 @@
-import "package:e_commerce_app/pages/home_page.dart";
+import "package:map_mates/pages/home_page.dart";
 import "package:flutter/material.dart";
 
 class IntroPage extends StatefulWidget {
