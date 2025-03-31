@@ -28,17 +28,21 @@ class _MapPageState extends State<MapPage> {
   }
 
   // Funktion zum abrufen der Location
-  void _startTracking() {
-    _locationSub = LocationService.getLocationStream().listen((LatLng pos) {
-      setState(() {
-        _currentLocation = pos;
+  void _startTracking() async {
+    final stream = await LocationService.getLocationStream();
+    if (stream != null) {
+      _locationSub = stream.listen((LatLng pos) {
+        setState(() {
+          _currentLocation = pos;
+        });
+        if (_lastMovedLocation == null ||
+            const Distance().as(LengthUnit.Meter, _lastMovedLocation!, pos) >
+                30) {
+          _mapController.move(pos, _mapController.camera.zoom);
+          _lastMovedLocation = pos;
+        }
       });
-       if (_lastMovedLocation == null ||
-        const Distance().as(LengthUnit.Meter, _lastMovedLocation!, pos) > 30) {
-        _mapController.move(pos, _mapController.camera.zoom);
-        _lastMovedLocation = pos;
-      }
-    });
+    }
   }
 
   @override
@@ -67,12 +71,12 @@ class _MapPageState extends State<MapPage> {
           MarkerLayer(
             markers: [
               Marker(
-                point: _currentLocation?? LatLng(52.5200, 13.4050), 
+                point: _currentLocation ?? LatLng(52.5200, 13.4050),
                 width: 50,
                 height: 50,
-                child: Icon(Icons.my_location, color: Colors.blue,)
-              )
-            ]
+                child: Icon(Icons.my_location, color: Colors.blue),
+              ),
+            ],
           ),
         ],
       ),
