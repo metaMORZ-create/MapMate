@@ -14,31 +14,32 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   // Variablen
-  late final MapController _mapController;
+  final MapController _mapController = MapController();
   LatLng? _currentLocation;
   LatLng? _lastMovedLocation;
   StreamSubscription<LatLng>? _locationSub;
-
-  // Bei Initierung der Seite
-  @override
-  void initState() {
-    super.initState();
-    _mapController = MapController();
-    _startTracking();
-  }
+  bool _mapReady = false;
 
   // Funktion zum abrufen der Location
   void _startTracking() async {
     final stream = await LocationService.getLocationStream();
     if (stream != null) {
       _locationSub = stream.listen((LatLng pos) {
+        debugPrint("Got position: $pos");
+
         setState(() {
           _currentLocation = pos;
         });
+
         if (_lastMovedLocation == null ||
             const Distance().as(LengthUnit.Meter, _lastMovedLocation!, pos) >
                 30) {
-          _mapController.move(pos, _mapController.camera.zoom);
+          debugPrint("Moved to: $pos");
+          _mapController.move(
+            pos,
+            _mapController.camera.zoom,
+            id: 'live_location',
+          );
           _lastMovedLocation = pos;
         }
       });
@@ -60,24 +61,26 @@ class _MapPageState extends State<MapPage> {
         options: MapOptions(
           initialCenter: _currentLocation ?? LatLng(52.5200, 13.4050),
           initialZoom: 12,
+          onMapReady: _startTracking,
         ),
         children: [
           TileLayer(
             urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             userAgentPackageName: 'com.example.map_page',
-            tileSize: 512,
+            tileDimension: 512,
             retinaMode: true,
           ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: _currentLocation ?? LatLng(52.5200, 13.4050),
-                width: 50,
-                height: 50,
-                child: Icon(Icons.my_location, color: Colors.blue),
-              ),
-            ],
-          ),
+          if (_currentLocation != null)
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: _currentLocation!,
+                  width: 50,
+                  height: 50,
+                  child: Icon(Icons.my_location, color: Colors.blue),
+                ),
+              ],
+            ),
         ],
       ),
     );
