@@ -60,15 +60,20 @@ class _MapPageState extends State<MapPage> {
       body: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
-          initialCenter: _currentLocation ?? LatLng(52.5200, 13.4050),
+          initialCenter: LatLng(52.5200, 13.4050),
           initialZoom: 12,
-          onMapReady: _startTracking,
+          onMapReady: () {
+            if (!_mapReady) {
+              _startTracking();
+              _mapReady = true;
+            }
+            debugPrint("Map is ready");
+          },
         ),
         children: [
           TileLayer(
             urlTemplate:
-                "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
-            subdomains: ['a', 'b', 'c'],
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             userAgentPackageName: 'com.example.map_page',
             tileDimension: 512,
             retinaMode: true,

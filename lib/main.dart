@@ -1,6 +1,5 @@
 import 'package:map_mates/pages/intro_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
