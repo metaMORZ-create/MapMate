@@ -38,7 +38,6 @@ class _MapPageState extends State<MapPage> {
           _mapController.move(
             pos,
             _mapController.camera.zoom,
-            id: 'live_location',
           );
           _lastMovedLocation = pos;
           debugPrint("Initial location: $_currentLocation");
