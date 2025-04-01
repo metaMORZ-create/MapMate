@@ -31,8 +31,8 @@ class LocationService {
       distanceFilter: 10,
     );
 
-    return Geolocator.getPositionStream(
-      locationSettings: locationSettings,
-    ).map((pos) => LatLng(pos.latitude, pos.longitude));
+    return Geolocator.getPositionStream().map((Position position) {
+      return LatLng(position.latitude, position.longitude);
+    });
   }
 }

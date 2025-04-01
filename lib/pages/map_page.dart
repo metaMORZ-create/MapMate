@@ -41,6 +41,8 @@ class _MapPageState extends State<MapPage> {
             id: 'live_location',
           );
           _lastMovedLocation = pos;
+          debugPrint("Initial location: $_currentLocation");
+          debugPrint("Last moved location: $_lastMovedLocation");
         }
       });
     }
@@ -65,7 +67,9 @@ class _MapPageState extends State<MapPage> {
         ),
         children: [
           TileLayer(
-            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            urlTemplate:
+                "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+            subdomains: ['a', 'b', 'c'],
             userAgentPackageName: 'com.example.map_page',
             tileDimension: 512,
             retinaMode: true,
