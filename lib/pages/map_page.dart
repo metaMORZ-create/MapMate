@@ -22,22 +22,10 @@ class _MapPageState extends State<MapPage> {
 
   // Funktion zum Abrufen der Location
   void _startTracking() async {
-    // Zuerst einmal den aktuellen Standort abfragen
-    final initialLocation = await LocationService.getCurrentLocation();
-    if (initialLocation != null) {
-      setState(() {
-        _currentLocation = initialLocation;
-      });
-      _mapController.move(initialLocation, _mapController.camera.zoom);
-      _lastMovedLocation = initialLocation;
-      debugPrint("Initial location set to: $_currentLocation");
-    }
-
     // Dann den Stream abonnieren, um weitere Updates zu erhalten
     final stream = await LocationService.getLocationStream();
     if (stream != null) {
       _locationSub = stream.listen((LatLng pos) {
-        debugPrint("Got position: $pos");
 
         setState(() {
           _currentLocation = pos;
@@ -46,11 +34,8 @@ class _MapPageState extends State<MapPage> {
         if (_lastMovedLocation == null ||
             const Distance().as(LengthUnit.Meter, _lastMovedLocation!, pos) >
                 30) {
-          debugPrint("Moved to: $pos");
           _mapController.move(pos, _mapController.camera.zoom);
           _lastMovedLocation = pos;
-          debugPrint("Updated location: $_currentLocation");
-          debugPrint("Last moved location: $_lastMovedLocation");
         }
       });
     }
@@ -80,7 +65,8 @@ class _MapPageState extends State<MapPage> {
         ),
         children: [
           TileLayer(
-            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+     //       urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            urlTemplate: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
             userAgentPackageName: 'com.example.map_page',
        //     tileDimension: 512,
        //     retinaMode: true,

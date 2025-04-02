@@ -1,9 +1,12 @@
+import "package:map_mates/components/login_button.dart";
+import "package:map_mates/components/register_button.dart";
 import "package:map_mates/pages/home_page.dart";
-import "package:map_mates/services/location_service.dart";
 import "package:flutter/material.dart";
 
 class IntroPage extends StatefulWidget {
-  const IntroPage({super.key});
+  final bool permissionGranted;
+
+  const IntroPage({super.key, required this.permissionGranted});
 
   @override
   State<IntroPage> createState() => _IntroPageState();
@@ -20,52 +23,20 @@ class _IntroPageState extends State<IntroPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 75),
-              // Title
-              const Text(
-                "Just Do It",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-              const SizedBox(height: 24),
+              // Logo
+              Image.asset("lib/images/logo.png"),
+              const SizedBox(height: 10),
               // Sub Title
               const Text(
-                "Brand new Sneakers and custom Kicks made with premium Quality",
+                "See Places you visited and discover your next adventure",
                 style: TextStyle(color: Colors.grey, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 48),
               // Start now button
-              GestureDetector(
-                onTap: () async {
-                  // Standortberechtigung vor dem Navigieren anfordern
-                  bool permissionGranted = await LocationService.checkAndRequestLocationPermission();
-                  if (permissionGranted) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Standortberechtigung ist erforderlich, um fortzufahren.'),
-                      ),
-                    );
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[900],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.all(25),
-                  child: const Center(
-                    child: Text(
-                      "Shop Now",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
+              RegisterButton(permissionGranted: widget.permissionGranted),
+              const SizedBox(height: 20),
+              LoginButton(permissionGranted: widget.permissionGranted),
             ],
           ),
         ),
