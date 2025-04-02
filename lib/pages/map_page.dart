@@ -69,7 +69,6 @@ class _MapPageState extends State<MapPage> {
       body: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
-          initialCenter: LatLng(52.5200, 13.4050),
           initialZoom: 12,
           onMapReady: () {
             if (!_mapReady) {
