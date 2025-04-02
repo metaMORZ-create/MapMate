@@ -68,8 +68,6 @@ class _MapPageState extends State<MapPage> {
      //       urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             urlTemplate: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
             userAgentPackageName: 'com.example.map_page',
-       //     tileDimension: 512,
-       //     retinaMode: true,
           ),
           if (_currentLocation != null)
             MarkerLayer(
@@ -78,7 +76,7 @@ class _MapPageState extends State<MapPage> {
                   point: _currentLocation!,
                   width: 50,
                   height: 50,
-                  child: Icon(Icons.my_location, color: Colors.blue),
+                  child: Icon(Icons.my_location_outlined, color: Colors.blue),
                 ),
               ],
             ),
