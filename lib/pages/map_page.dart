@@ -83,7 +83,7 @@ class _MapPageState extends State<MapPage> {
             urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             userAgentPackageName: 'com.example.map_page',
        //     tileDimension: 512,
-            retinaMode: true,
+       //     retinaMode: true,
           ),
           if (_currentLocation != null)
             MarkerLayer(
