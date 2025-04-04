@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:map_mates/pages/home_page.dart";
+import "package:map_mates/pages/login_page.dart";
 
 class LoginButton extends StatelessWidget {
   final bool permissionGranted;
@@ -12,7 +12,7 @@ class LoginButton extends StatelessWidget {
         if (permissionGranted) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

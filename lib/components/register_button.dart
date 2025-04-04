@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:map_mates/pages/home_page.dart";
+import "package:map_mates/pages/register_page.dart";
 
 class RegisterButton extends StatelessWidget {
   final bool permissionGranted;
@@ -12,7 +12,7 @@ class RegisterButton extends StatelessWidget {
         if (permissionGranted) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => RegisterPage()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

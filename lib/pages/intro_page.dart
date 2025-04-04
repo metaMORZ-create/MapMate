@@ -1,6 +1,5 @@
 import "package:map_mates/components/login_button.dart";
 import "package:map_mates/components/register_button.dart";
-import "package:map_mates/pages/home_page.dart";
 import "package:flutter/material.dart";
 
 class IntroPage extends StatefulWidget {
