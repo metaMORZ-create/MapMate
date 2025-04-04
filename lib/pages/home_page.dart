@@ -1,8 +1,11 @@
 import "package:map_mates/components/bottom_navigation_bar.dart";
+import "package:map_mates/pages/intro_page.dart";
 import "package:map_mates/pages/map_page.dart";
 import "package:map_mates/pages/settings_page.dart";
 import "package:map_mates/pages/profiles_page.dart";
 import "package:flutter/material.dart";
+import "package:map_mates/services/location_service.dart";
+import "package:map_mates/services/login_register_service.dart";
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -89,11 +92,22 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
 
-            const Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: ListTile(
-                leading: Icon(Icons.logout, color: Colors.white),
-                title: Text("Logout", style: TextStyle(color: Colors.white)),
+            GestureDetector(
+              onTap: () async {
+                await LoginRegisterService().logout();
+                final permissionGranted = await LocationService.checkAndRequestLocationPermission();
+                Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => IntroPage(permissionGranted: permissionGranted,)),
+                (route) => false,
+                );
+              },
+              child: const Padding(
+                padding: const EdgeInsets.only(left: 25),
+                child: ListTile(
+                  leading: Icon(Icons.logout, color: Colors.white),
+                  title: Text("Logout", style: TextStyle(color: Colors.white)),
+                ),
               ),
             ),
           ],
