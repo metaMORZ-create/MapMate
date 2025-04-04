@@ -6,7 +6,7 @@ import "package:http/http.dart" as http;
 class LoginRegisterService {
   // Login Verifizierung
   static Future<bool> login(String username, String password) async {
-    const url = "https://map-mates-profile-api-production.up.railway.app/login";
+    const url = "https://map-mates-profile-api-production.up.railway.app/users/login";
 
     try {
       final response = await http.post(
@@ -18,12 +18,13 @@ class LoginRegisterService {
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final username = json["user"];
-        final message = json["message"];
+        final user_id = json["user_id"];
 
         // Eingeloggt sein merken
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('loggedIn', true);
         await prefs.setString('username', username);
+        await prefs.setInt('user_id', user_id);
 
         return true;
       } else {
@@ -43,7 +44,7 @@ class LoginRegisterService {
     String password,
   ) async {
     const url =
-        "https://map-mates-profile-api-production.up.railway.app/register";
+        "https://map-mates-profile-api-production.up.railway.app/users/register";
 
     try {
       final response = await http.post(
@@ -53,20 +54,21 @@ class LoginRegisterService {
           "username": username,
           "email": email,
           "password": password,
+          "disabled": false
         }),
       );
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final username = json["user"];
-        final message = json["message"];
+        final user_id = json["user_id"];
 
         // Eingeloggt sein merken
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('loggedIn', true);
         await prefs.setString('username', username);
+        await prefs.setInt('user_id', user_id);
 
-        debugPrint("Login erfolgreich $message ($username)");
         return true;
       } else {
         debugPrint("Login Fehlgeschlagen");

@@ -1,5 +1,8 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import "package:http/http.dart" as http;
+import "dart:convert";
+import "package:flutter/cupertino.dart";
 
 class LocationService {
   // Erlaubnis auf Standort zugreifen
@@ -34,5 +37,33 @@ class LocationService {
     return Geolocator.getPositionStream(locationSettings: locationSettings).map((Position position) {
       return LatLng(position.latitude, position.longitude);
     });
+  }
+
+  // Service zum Speichern der Standortdaten in der DB
+  static Future<bool> addLocation(int userId, LatLng pos) async {
+    const url = "https://map-mates-profile-api-production.up.railway.app/locations/add_location";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"user_id": userId, "latitude": pos.latitude, "longitude": pos.longitude}),
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final username = json["user"];
+        debugPrint("Added Location for: $username");
+
+        return true;
+
+      } else {
+        debugPrint("Adding Location failed");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error during Adding of location: $e");
+      return false;
+    }
   }
 }
