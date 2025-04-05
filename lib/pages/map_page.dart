@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:map_mates/services/location_tracker.dart';
+import 'package:map_mates/services/math_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapPage extends StatefulWidget {
@@ -21,10 +23,11 @@ class _MapPageState extends State<MapPage> {
   LatLng? _currentLocation;
   bool _mapReady = false;
   late final StreamSubscription<LatLng> _trackerSub;
-  List<LatLng> _visitedPoints = [];
+  List<Map<String, dynamic>> _visitedZones = [];
 
   // FUNKTIONEN
 
+  
   // Load Last Visited Zones
   Future<void> _loadVisitedZones() async {
     final prefs = await SharedPreferences.getInstance();
@@ -32,8 +35,7 @@ class _MapPageState extends State<MapPage> {
     if (userId != null) {
       final zones = await LocationService.getVisitedZones(userId);
       setState(() {
-        _visitedPoints =
-            zones.map((z) => LatLng(z["latitude"], z["longitude"])).toList();
+        _visitedZones= zones;
       });
     }
   }
@@ -90,8 +92,31 @@ class _MapPageState extends State<MapPage> {
             urlTemplate:
                 "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
             userAgentPackageName: 'com.example.map_page',
+            tileBuilder: (context, widget, tile) {
+              return ColorFiltered(
+                colorFilter: const ColorFilter.mode(
+                  Colors.grey,
+                  BlendMode.saturation,
+                ),
+                child: widget,
+              );
+            },
           ),
-
+          // Zonen wieder farbig sichtbar
+          PolygonLayer(
+            polygons: _visitedZones.map((zone) {
+              final points = MathService.createCircle(
+                zone["latitude"],
+                zone["longitude"],
+                zone["radius"] ?? 5.0,
+              );
+              return Polygon(
+                points: points,
+                color: Colors.transparent,
+                borderColor: Colors.transparent,
+              );
+            }).toList(),
+          ),
           // Marker für aktuellen Standort
           if (_currentLocation != null)
             MarkerLayer(
