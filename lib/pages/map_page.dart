@@ -1,9 +1,11 @@
-import "dart:async";
+import 'dart:async';
 
-import "package:flutter/material.dart";
-import "package:flutter_map/flutter_map.dart";
-import "package:latlong2/latlong.dart";
-import "package:map_mates/services/location_tracker.dart";
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:map_mates/services/location_service.dart';
+import 'package:map_mates/services/location_tracker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -15,9 +17,26 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final MapController _mapController = MapController();
 
+  // VARIABLEN
   LatLng? _currentLocation;
   bool _mapReady = false;
   late final StreamSubscription<LatLng> _trackerSub;
+  List<LatLng> _visitedPoints = [];
+
+  // FUNKTIONEN
+
+  // Load Last Visited Zones
+  Future<void> _loadVisitedZones() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt("user_id");
+    if (userId != null) {
+      final zones = await LocationService.getVisitedZones(userId);
+      setState(() {
+        _visitedPoints =
+            zones.map((z) => LatLng(z["latitude"], z["longitude"])).toList();
+      });
+    }
+  }
 
   // Startet das Location-Tracking & aktualisiert die Karte
   void _startTracking() {
@@ -48,7 +67,7 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -59,7 +78,8 @@ class _MapPageState extends State<MapPage> {
           onMapReady: () {
             if (!_mapReady) {
               _mapReady = true;
-              _startTracking(); // Erst starten, wenn Karte bereit ist
+              _startTracking();
+              _loadVisitedZones(); // Erst starten, wenn Karte bereit ist
             }
             debugPrint("Map is ready");
           },

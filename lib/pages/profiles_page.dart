@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:map_mates/components/friend_requests_tab.dart';
-import 'package:map_mates/components/friends_tab.dart';
-import 'package:map_mates/components/search_tab.dart';
+import 'package:map_mates/pages/friend_requests_tab.dart';
+import 'package:map_mates/pages/friends_tab.dart';
+import 'package:map_mates/pages/search_tab.dart';
 
 class ProfilesPage extends StatelessWidget {
   const ProfilesPage({super.key});

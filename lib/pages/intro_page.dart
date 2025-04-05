@@ -27,7 +27,7 @@ class _IntroPageState extends State<IntroPage> {
               const SizedBox(height: 10),
               // Sub Title
               const Text(
-                "See Places you visited and discover your next adventure",
+                "„Ich sehe die Welt in Grau - außer dort, wo ich war - dort ist sie bunt.“",
                 style: TextStyle(color: Colors.grey, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
