@@ -1,4 +1,7 @@
 import "package:flutter/material.dart";
+import "package:map_mates/pages/intro_page.dart";
+import "package:map_mates/services/location_service.dart";
+import "package:map_mates/services/login_register_service.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 class SettingsPage extends StatefulWidget {
@@ -32,24 +35,65 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: Colors.grey[300],
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(top: 50, left: 10, right: 10, bottom: 20),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[500],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.all(25),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.account_circle), 
-                    const SizedBox(width: 5), 
+                    Icon(Icons.account_circle, size: 32),
+                    const SizedBox(width: 5),
                     Text(
                       _username ?? "Lade Benutzerdaten",
-                      )
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await LoginRegisterService().logout();
+                  final permissionGranted =
+                      await LocationService.checkAndRequestLocationPermission();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) =>
+                              IntroPage(permissionGranted: permissionGranted),
+                    ),
+                    (route) => false,
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(25),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(Icons.logout, size: 32),
+                      Text(
+                        "Logout",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
+                  ),
                 ),
               ),
             ],

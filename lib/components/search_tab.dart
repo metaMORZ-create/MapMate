@@ -1,0 +1,87 @@
+import 'package:flutter/material.dart';
+import 'package:map_mates/services/social_service.dart';
+
+class SearchTab extends StatefulWidget {
+  const SearchTab({super.key});
+
+  @override
+  State<SearchTab> createState() => _SearchTabState();
+}
+
+class _SearchTabState extends State<SearchTab> {
+  List results_list = [];
+  List user_list = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextField(
+              onChanged: (search) async {
+                results_list = await SocialService.search(search);
+                setState(() {
+                  user_list = results_list;
+                });
+              },
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: "Search...",
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: user_list.length,
+                itemBuilder: (context, index) {
+                  final eintrag = user_list[index]["username"];
+                  final user = user_list[index];
+                  Widget trailingIcon;
+
+                  if (user["already_friends"] == true) {
+                    trailingIcon = Icon(Icons.check, color: Colors.green);
+                  } else if (user["request_sent"] == true) {
+                    trailingIcon = Icon(
+                      Icons.hourglass_bottom,
+                      color: Colors.orange,
+                    );
+                  } else {
+                    trailingIcon = GestureDetector(
+                      onTap: () async {
+                        final success = await SocialService.sendFriendRequest(
+                          user["id"],
+                        );
+                        if (success) {
+                          setState(() {
+                            user["request_sent"] =
+                                true; 
+                          });
+                        }
+                      },
+                      child: Icon(Icons.person_add, color: Colors.blue),
+                    );
+                  }
+
+                  return ListTile(title: Text(eintrag), trailing: trailingIcon);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
