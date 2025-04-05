@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:map_mates/components/accept_friend_request_button.dart';
+import 'package:map_mates/components/deny_friend_request_button.dart';
 import 'package:map_mates/services/social_service.dart';
 
 class SearchTab extends StatefulWidget {
@@ -23,6 +25,7 @@ class _SearchTabState extends State<SearchTab> {
             TextField(
               onChanged: (search) async {
                 results_list = await SocialService.search(search);
+                if (!mounted) return;
                 setState(() {
                   user_list = results_list;
                 });
@@ -58,6 +61,34 @@ class _SearchTabState extends State<SearchTab> {
                       Icons.hourglass_bottom,
                       color: Colors.orange,
                     );
+                  } else if (user["request_received"] == true) {
+                    trailingIcon = SizedBox(
+                      width: 140,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AcceptFriendButton(
+                            userId: user["id"],
+                            onAccepted: () {
+                              if (!mounted) return;
+                              setState(() {
+                                user["already_friends"] = true;
+                                user["request_received"] = false;
+                              });
+                            },
+                          ),
+                          DenyFriendButton(
+                            userId: user["id"],
+                            onAccepted: () {
+                              if (!mounted) return;
+                              setState(() {
+                                user["request_received"] = false;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    );
                   } else {
                     trailingIcon = GestureDetector(
                       onTap: () async {
@@ -65,9 +96,9 @@ class _SearchTabState extends State<SearchTab> {
                           user["id"],
                         );
                         if (success) {
+                          if (!mounted) return;
                           setState(() {
-                            user["request_sent"] =
-                                true; 
+                            user["request_sent"] = true;
                           });
                         }
                       },

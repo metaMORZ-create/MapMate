@@ -1,11 +1,8 @@
 import "package:map_mates/components/bottom_navigation_bar.dart";
-import "package:map_mates/pages/intro_page.dart";
 import "package:map_mates/pages/map_page.dart";
 import "package:map_mates/pages/settings_page.dart";
 import "package:map_mates/pages/profiles_page.dart";
 import "package:flutter/material.dart";
-import "package:map_mates/services/location_service.dart";
-import "package:map_mates/services/login_register_service.dart";
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
