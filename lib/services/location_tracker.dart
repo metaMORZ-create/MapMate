@@ -18,7 +18,7 @@ class LocationTracker {
   LatLng? _lastSavedLocation;
 
   // Start Location Tracking
-  Future<void> start({double minDistanceMeters = 10}) async {
+  Future<void> start({double minDistanceMeters = 3}) async {
     final stream = await LocationService.getLocationStream();
     final prefs = await SharedPreferences.getInstance();
 

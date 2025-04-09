@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:map_mates/services/location_tracker.dart';
-import 'package:map_mates/services/math_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapPage extends StatefulWidget {
@@ -49,6 +47,7 @@ class _MapPageState extends State<MapPage> {
     final userId = prefs.getInt("user_id");
     if (userId != null) {
       final polygon = await LocationService.getVisitedPolygons(userId);
+      if (!mounted) return;
       setState(() {
         _visitedPolygon = polygon;
       });
@@ -60,6 +59,7 @@ class _MapPageState extends State<MapPage> {
     // Hole letzten bekannten Standort (z. B. falls Map später gebaut wird)
     final lastPos = LocationTracker().lastKnownLocation;
     if (lastPos != null) {
+      if (!mounted) return;
       setState(() {
         _currentLocation = lastPos;
       });
@@ -79,8 +79,7 @@ class _MapPageState extends State<MapPage> {
           const Distance().as(LengthUnit.Meter, _lastRecordedLocation!, pos) >
               10) {
         _lastRecordedLocation = pos;
-        final prefs = await SharedPreferences.getInstance();
-        final userId = prefs.getInt("user_id");
+        
         await _loadVisitedPolygons();
       }
     });
@@ -118,6 +117,7 @@ class _MapPageState extends State<MapPage> {
           ),
           // Zonen wieder farbig sichtbar
           PolygonLayer(
+            key: ValueKey(_visitedPolygon.length),
             polygons: [
               Polygon(
                 points: outerPolygon,
