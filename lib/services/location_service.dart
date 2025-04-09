@@ -121,4 +121,21 @@ class LocationService {
       return [];
     }
   }
+  // Get Polygon from visited areas
+  static Future<List<List<LatLng>>> getVisitedPolygons(int userId) async {
+  final response = await http.get(Uri.parse("https://map-mates-profile-api-production.up.railway.app/locations/visited_polygon/$userId"));
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+
+    final features = data["features"] as List;
+    return features.map<List<LatLng>>((feature) {
+      final coords = feature["geometry"]["coordinates"][0];
+      return coords.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
+    }).toList();
+  } else {
+    throw Exception("Failed to load visited polygons");
+  }
+}
+
 }

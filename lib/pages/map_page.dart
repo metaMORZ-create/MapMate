@@ -24,21 +24,50 @@ class _MapPageState extends State<MapPage> {
   bool _mapReady = false;
   late final StreamSubscription<LatLng> _trackerSub;
   List<Map<String, dynamic>> _visitedZones = [];
+  List<List<LatLng>> _visitedPolygon = [];
+
+  final List<LatLng> outerPolygon = [
+    LatLng(85, 90),
+    LatLng(85, 0.1),
+    LatLng(85, -90),
+    LatLng(85, -179.9),
+    LatLng(0, -179.9),
+    LatLng(-85, -179.9),
+    LatLng(-85, -90),
+    LatLng(-85, 0.1),
+    LatLng(-85, 90),
+    LatLng(-85, 179.9),
+    LatLng(0, 179.9),
+    LatLng(85, 179.9),
+  ];
 
   // FUNKTIONEN
 
-  
-  // Load Last Visited Zones
+  /* Load Last Visited Zones
   Future<void> _loadVisitedZones() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
     if (userId != null) {
       final zones = await LocationService.getVisitedZones(userId);
+      final holes = _createHoleCoordinates(zones);
       setState(() {
-        _visitedZones= zones;
+        _visitedZones = zones;
+        _visitedHoles = holes;
       });
     }
+  } */
+
+  // Load Visited Polygon
+  Future<void> _loadVisitedPolygon() async {
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getInt("user_id");
+  if (userId != null) {
+    final polygon = await LocationService.getVisitedPolygons(userId);
+    setState(() {
+      _visitedPolygon = polygon;
+    });
   }
+}
 
   // Startet das Location-Tracking & aktualisiert die Karte
   void _startTracking() {
@@ -56,11 +85,22 @@ class _MapPageState extends State<MapPage> {
       setState(() {
         _currentLocation = pos;
       });
-
+      debugPrint(_currentLocation.toString());
       if (_mapReady) {
         _mapController.move(pos, _mapController.camera.zoom);
       }
     });
+  }
+
+  List<List<LatLng>> _createHoleCoordinates(List<Map<String, dynamic>> zones) {
+    // Für jede Zone wird ein Kreis (als Liste von LatLng-Punkten) erzeugt.
+    return zones.map<List<LatLng>>((zone) {
+      final double lat = zone["latitude"];
+      final double lng = zone["longitude"];
+      // Falls kein Radius definiert ist, wird ein Default-Wert (hier 5.0) genutzt.
+      final double radius = zone["radius"] ?? 5.0;
+      return MathService.createCircle(lat, lng, radius);
+    }).toList();
   }
 
   @override
@@ -69,19 +109,19 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
-          initialZoom: 12,
+          initialZoom: 14,
           onMapReady: () {
             if (!_mapReady) {
               _mapReady = true;
               _startTracking();
-              _loadVisitedZones(); // Erst starten, wenn Karte bereit ist
+              _loadVisitedPolygon(); // Erst starten, wenn Karte bereit ist
             }
             debugPrint("Map is ready");
           },
@@ -90,32 +130,20 @@ class _MapPageState extends State<MapPage> {
           // Satellitenkarte via ArcGIS
           TileLayer(
             urlTemplate:
-                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png",
             userAgentPackageName: 'com.example.map_page',
-            tileBuilder: (context, widget, tile) {
-              return ColorFiltered(
-                colorFilter: const ColorFilter.mode(
-                  Colors.grey,
-                  BlendMode.saturation,
-                ),
-                child: widget,
-              );
-            },
           ),
           // Zonen wieder farbig sichtbar
           PolygonLayer(
-            polygons: _visitedZones.map((zone) {
-              final points = MathService.createCircle(
-                zone["latitude"],
-                zone["longitude"],
-                zone["radius"] ?? 5.0,
-              );
-              return Polygon(
-                points: points,
-                color: Colors.transparent,
-                borderColor: Colors.transparent,
-              );
-            }).toList(),
+            polygons: [
+              Polygon(
+                points: outerPolygon,
+                holePointsList: _visitedPolygon,
+                color: Colors.black.withValues(alpha: 0.6),
+                // Füllfarbe für das äußere Polygon
+                //borderColor: Colors.transparent,
+              ),
+            ],
           ),
           // Marker für aktuellen Standort
           if (_currentLocation != null)
@@ -125,7 +153,10 @@ class _MapPageState extends State<MapPage> {
                   point: _currentLocation!,
                   width: 50,
                   height: 50,
-                  child: const Icon(Icons.my_location_outlined, color: Colors.blue),
+                  child: const Icon(
+                    Icons.my_location_outlined,
+                    color: Colors.blue,
+                  ),
                 ),
               ],
             ),

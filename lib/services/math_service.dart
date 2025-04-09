@@ -3,7 +3,7 @@ import 'package:latlong2/latlong.dart';
 
 class MathService {
   static List<LatLng> createCircle(double lat, double lng, double radius) {
-    const int points = 64;
+    const int points = 12;
     const double earthRadius = 6378137.0;
     double latRad = lat * (pi / 180.0);
     double lngRad = lng * (pi / 180.0);
