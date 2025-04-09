@@ -23,7 +23,7 @@ class _MapPageState extends State<MapPage> {
   LatLng? _currentLocation;
   bool _mapReady = false;
   late final StreamSubscription<LatLng> _trackerSub;
-  List<Map<String, dynamic>> _visitedZones = [];
+  LatLng? _lastRecordedLocation;
   List<List<LatLng>> _visitedPolygon = [];
 
   final List<LatLng> outerPolygon = [
@@ -43,31 +43,17 @@ class _MapPageState extends State<MapPage> {
 
   // FUNKTIONEN
 
-  /* Load Last Visited Zones
-  Future<void> _loadVisitedZones() async {
+  // Load Visited Polygon
+  Future<void> _loadVisitedPolygons() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
     if (userId != null) {
-      final zones = await LocationService.getVisitedZones(userId);
-      final holes = _createHoleCoordinates(zones);
+      final polygon = await LocationService.getVisitedPolygons(userId);
       setState(() {
-        _visitedZones = zones;
-        _visitedHoles = holes;
+        _visitedPolygon = polygon;
       });
     }
-  } */
-
-  // Load Visited Polygon
-  Future<void> _loadVisitedPolygon() async {
-  final prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getInt("user_id");
-  if (userId != null) {
-    final polygon = await LocationService.getVisitedPolygons(userId);
-    setState(() {
-      _visitedPolygon = polygon;
-    });
   }
-}
 
   // Startet das Location-Tracking & aktualisiert die Karte
   void _startTracking() {
@@ -81,7 +67,7 @@ class _MapPageState extends State<MapPage> {
     }
 
     // Höre auf neue Positionen vom globalen Stream
-    _trackerSub = LocationTracker().stream.listen((pos) {
+    _trackerSub = LocationTracker().stream.listen((pos) async {
       setState(() {
         _currentLocation = pos;
       });
@@ -89,18 +75,15 @@ class _MapPageState extends State<MapPage> {
       if (_mapReady) {
         _mapController.move(pos, _mapController.camera.zoom);
       }
+      if (_lastRecordedLocation == null ||
+          const Distance().as(LengthUnit.Meter, _lastRecordedLocation!, pos) >
+              10) {
+        _lastRecordedLocation = pos;
+        final prefs = await SharedPreferences.getInstance();
+        final userId = prefs.getInt("user_id");
+        await _loadVisitedPolygons();
+      }
     });
-  }
-
-  List<List<LatLng>> _createHoleCoordinates(List<Map<String, dynamic>> zones) {
-    // Für jede Zone wird ein Kreis (als Liste von LatLng-Punkten) erzeugt.
-    return zones.map<List<LatLng>>((zone) {
-      final double lat = zone["latitude"];
-      final double lng = zone["longitude"];
-      // Falls kein Radius definiert ist, wird ein Default-Wert (hier 5.0) genutzt.
-      final double radius = zone["radius"] ?? 5.0;
-      return MathService.createCircle(lat, lng, radius);
-    }).toList();
   }
 
   @override
@@ -121,7 +104,7 @@ class _MapPageState extends State<MapPage> {
             if (!_mapReady) {
               _mapReady = true;
               _startTracking();
-              _loadVisitedPolygon(); // Erst starten, wenn Karte bereit ist
+              _loadVisitedPolygons(); // Erst starten, wenn Karte bereit ist
             }
             debugPrint("Map is ready");
           },
