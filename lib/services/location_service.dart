@@ -124,27 +124,30 @@ class LocationService {
   }
 
   // Get Polygon from visited areas
-  static Future<List<List<LatLng>>> getVisitedPolygons(int userId) async {
-    final response = await http.get(
-      Uri.parse(
-        "https://map-mates-profile-api-production.up.railway.app/locations/visited_polygon/$userId",
-      ),
-    );
+  static Future<List<List<LatLng>>> getVisitedPolygons(List<Map<String, dynamic>> zones) async {
+  final url = Uri.parse("https://map-mates-profile-api-production.up.railway.app/locations/visited_polygons");
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(zones),
+  );
 
-      final features = data["features"] as List;
-      return features.map<List<LatLng>>((feature) {
-        final coords = feature["geometry"]["coordinates"][0];
-        return coords
-            .map<LatLng>((coord) => LatLng(coord[1], coord[0]))
-            .toList();
-      }).toList();
-    } else {
-      throw Exception("Failed to load visited polygons");
-    }
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+
+    final features = data["features"] as List;
+    return features.map<List<LatLng>>((feature) {
+      final coords = feature["geometry"]["coordinates"][0];
+      return coords
+          .map<LatLng>((coord) => LatLng(coord[1], coord[0]))
+          .toList();
+    }).toList();
+  } else {
+    throw Exception("Failed to load polygons from zones. Status Code: ${response.statusCode}");
   }
+}
+
 
   static Future<void> uploadBatchVisitedZones(
     List<Map<String, dynamic>> zones,
@@ -173,6 +176,30 @@ class LocationService {
 
     if (response.statusCode != 200) {
       throw Exception("Failed to upload visited zones. Status Code: ${response.statusCode}");
+    }
+  }
+
+  static Future<Map<String, dynamic>?> getLastLocation(int userId) async {
+    final url = Uri.parse("https://map-mates-profile-api-production.up.railway.app/locations/last_location/$userId");
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          "userId": data["user_id"],
+          "position": LatLng(data["latitude"], data["longitude"]),
+          "altitude": data["altitude"],
+          "timestamp": DateTime.parse(data["timestamp"]),
+        };
+      } else {
+        debugPrint("Fehler beim Abrufen des letzten Standorts: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("Exception bei getLastLocation: $e");
+      return null;
     }
   }
 }

@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:map_mates/pages/area_map.dart";
 import "package:map_mates/services/social_service.dart";
 
 class FriendsTab extends StatefulWidget {
@@ -37,6 +38,17 @@ class _FriendsTabState extends State<FriendsTab> {
           leading: Icon(Icons.person),
           title: Text(friend["friend_username"]),
           subtitle: Text("ID: ${friend["friend_id"]}"),
+          trailing: IconButton(
+            icon: const Icon(Icons.map),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => VisitedAreaPage(userId: friend["friend_id"]),
+                ),
+              );
+            },
+          ),
         );
       },
     );
