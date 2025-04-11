@@ -13,7 +13,7 @@ void main() async {
 
   // Standortberechtigung abfragen
   bool permissionGranted = await LocationService.checkAndRequestLocationPermission();
-  await LocationTracker().start();
+  await LocationTracker().startBatchTracking();
 
   runApp(MyApp(permissionGranted: permissionGranted, loggedIn: isLoggedIn,));
 }

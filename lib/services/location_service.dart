@@ -98,20 +98,21 @@ class LocationService {
   }
 
   static Future<List<Map<String, dynamic>>> getVisitedZones(int userId) async {
-    String url = "https://map-mates-profile-api-production.up.railway.app/locations/visited_zones/$userId";
-    
+    String url =
+        "https://map-mates-profile-api-production.up.railway.app/locations/visited_zones/$userId";
+
     try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        final List<Map<String, dynamic>> visitedZones = jsonList.cast<Map<String, dynamic>>();
+        final List<Map<String, dynamic>> visitedZones =
+            jsonList.cast<Map<String, dynamic>>();
 
         return visitedZones;
-
       } else {
         debugPrint("Suche fehlgeschlagen: ${response.statusCode}");
         return [];
@@ -121,21 +122,57 @@ class LocationService {
       return [];
     }
   }
+
   // Get Polygon from visited areas
   static Future<List<List<LatLng>>> getVisitedPolygons(int userId) async {
-  final response = await http.get(Uri.parse("https://map-mates-profile-api-production.up.railway.app/locations/visited_polygon/$userId"));
+    final response = await http.get(
+      Uri.parse(
+        "https://map-mates-profile-api-production.up.railway.app/locations/visited_polygon/$userId",
+      ),
+    );
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
 
-    final features = data["features"] as List;
-    return features.map<List<LatLng>>((feature) {
-      final coords = feature["geometry"]["coordinates"][0];
-      return coords.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
-    }).toList();
-  } else {
-    throw Exception("Failed to load visited polygons");
+      final features = data["features"] as List;
+      return features.map<List<LatLng>>((feature) {
+        final coords = feature["geometry"]["coordinates"][0];
+        return coords
+            .map<LatLng>((coord) => LatLng(coord[1], coord[0]))
+            .toList();
+      }).toList();
+    } else {
+      throw Exception("Failed to load visited polygons");
+    }
   }
-}
 
+  static Future<void> uploadBatchVisitedZones(
+    List<Map<String, dynamic>> zones,
+  ) async {
+    final url = Uri.parse("https://map-mates-profile-api-production.up.railway.app/locations/batch_visited_zones");
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"locations": zones}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to upload visited zones. Status Code: ${response.statusCode}");
+    }
+  }
+
+  static Future<void> uploadBatchLocations(
+    List<Map<String, dynamic>> zones,
+  ) async {
+    final url = Uri.parse("https://map-mates-profile-api-production.up.railway.app/locations/batch_add_locations");
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"locations": zones}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to upload visited zones. Status Code: ${response.statusCode}");
+    }
+  }
 }

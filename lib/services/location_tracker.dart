@@ -1,11 +1,10 @@
 import 'dart:async';
-
+import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationTracker {
-  // Variablen
   static final LocationTracker _instance = LocationTracker._internal();
   factory LocationTracker() => _instance;
   LocationTracker._internal();
@@ -17,36 +16,58 @@ class LocationTracker {
   LatLng? _lastEmittedLocation;
   LatLng? _lastSavedLocation;
 
-  // Start Location Tracking
-  Future<void> start({double minDistanceMeters = 3}) async {
+  final List<Map<String, dynamic>> _pendingVisited = [];
+  Timer? _uploadTimer;
+
+  Future<void> startBatchTracking({
+    double minDistanceMeters = 10,
+    Duration uploadInterval = const Duration(seconds: 10),
+  }) async {
     final stream = await LocationService.getLocationStream();
     final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt("user_id");
+    if (userId == null) return;
+
+    _uploadTimer = Timer.periodic(uploadInterval, (_) {
+      _uploadBatch(userId);
+    });
 
     if (stream != null) {
-      _subscription = stream.listen((pos) async {
-        final userId = await prefs.getInt("user_id");
-
-        // Stream an UI immer weiterleiten für flüssige Map-Bewegung
+      _subscription = stream.listen((pos) {
         _locationStreamController.add(pos);
         _lastEmittedLocation = pos;
 
-        if (userId == null) return;
-
-        // Nur speichern, wenn 10m weiter entfernt als letzte gespeicherte
         if (_lastSavedLocation == null ||
             const Distance().as(LengthUnit.Meter, _lastSavedLocation!, pos) >=
                 minDistanceMeters) {
-          await LocationService.addLocation(userId, pos);
-          await LocationService.markVisitedZone(userId, pos);
+          final now = DateTime.now().toIso8601String();
+          _pendingVisited.add({
+            "user_id": userId,
+            "latitude": pos.latitude,
+            "longitude": pos.longitude,
+            "timestamp": now,
+          });
           _lastSavedLocation = pos;
         }
       });
     }
   }
 
-  // Stoppt das Tracking und beendet den Broadcat
+  Future<void> _uploadBatch(int userId) async {
+    if (_pendingVisited.isEmpty) return;
+
+    try {
+      await LocationService.uploadBatchVisitedZones(_pendingVisited);
+      await LocationService.uploadBatchLocations(_pendingVisited);
+      _pendingVisited.clear();
+    } catch (e) {
+      debugPrint("Fehler beim Batch-Upload: $e");
+    }
+  }
+
   void stop() {
     _subscription?.cancel();
+    _uploadTimer?.cancel();
     _locationStreamController.close();
   }
 
