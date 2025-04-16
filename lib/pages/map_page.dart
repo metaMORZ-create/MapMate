@@ -23,6 +23,7 @@ class _MapPageState extends State<MapPage> {
   late final StreamSubscription<LatLng> _trackerSub;
 
   int? _userId;
+  String? _userName;
 
   // FUNKTIONEN
   @override
@@ -38,6 +39,7 @@ class _MapPageState extends State<MapPage> {
     if (!mounted) return;
     setState(() {
       _userId = prefs.getInt("user_id");
+      _userName = prefs.getString("username");
     });
   }
 
@@ -118,7 +120,7 @@ class _MapPageState extends State<MapPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => VisitedAreaPage(userId: _userId!),
+                      builder: (_) => VisitedAreaPage(userId: _userId!, userName: _userName!,),
                     ),
                   );
                 },

@@ -44,7 +44,7 @@ class _FriendsTabState extends State<FriendsTab> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => VisitedAreaPage(userId: friend["friend_id"]),
+                  builder: (_) => VisitedAreaPage(userId: friend["friend_id"], userName: friend["friend_username"],),
                 ),
               );
             },

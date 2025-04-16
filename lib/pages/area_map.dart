@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_mates/services/location_service.dart';
+import 'package:map_mates/services/location_tracker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class VisitedAreaPage extends StatefulWidget {
   final int userId;
+  final String userName;
 
-  const VisitedAreaPage({super.key, required this.userId});
+  const VisitedAreaPage({super.key, required this.userId, required this.userName});
 
   @override
   State<VisitedAreaPage> createState() => _VisitedAreaPageState();
@@ -45,8 +47,9 @@ class _VisitedAreaPageState extends State<VisitedAreaPage> {
     }
 
     if (pos != null && mounted) {
-      final zones = await LocationService.getVisitedZones(widget.userId);
-      final polygon = await LocationService.getVisitedPolygons(zones);
+      final polygon = await LocationService.getStoredVisitedPolygon(
+        widget.userId,
+      );
 
       setState(() {
         _currentLocation = pos;
@@ -60,6 +63,26 @@ class _VisitedAreaPageState extends State<VisitedAreaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Center(child: Text("${widget.userName} Visited Areas", style: TextStyle(color: Colors.white, fontSize: 14),)),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.white,),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              LocationTracker().updatePolygonOnce(widget.userId);
+              _initializeMap();
+            }, 
+            icon: Icon(Icons.refresh, color: Colors.white,)
+            )
+        ],
+      ),
       body: FlutterMap(
         mapController: _mapController,
         options: MapOptions(

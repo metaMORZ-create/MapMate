@@ -1,4 +1,5 @@
 import "dart:convert";
+import "package:map_mates/services/location_tracker.dart";
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:flutter/cupertino.dart";
 import "package:http/http.dart" as http;
@@ -6,7 +7,8 @@ import "package:http/http.dart" as http;
 class LoginRegisterService {
   // Login Verifizierung
   static Future<bool> login(String username, String password) async {
-    const url = "https://map-mates-profile-api-production.up.railway.app/users/login";
+    const url =
+        "https://map-mates-profile-api-production.up.railway.app/users/login";
 
     try {
       final response = await http.post(
@@ -18,13 +20,20 @@ class LoginRegisterService {
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final username = json["user"];
-        final user_id = json["user_id"];
+        final userId = json["user_id"];
 
         // Eingeloggt sein merken
         final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
         await prefs.setBool('loggedIn', true);
         await prefs.setString('username', username);
-        await prefs.setInt('user_id', user_id);
+        await prefs.setInt('user_id', userId);
+
+        // Tracking Starten nach Login
+        await LocationTracker().startBatchTracking();
+        await LocationTracker().updatePolygonOnce(userId);
+        LocationTracker().startAutoPolygonUpdate(userId);
+
 
         return true;
       } else {
@@ -54,20 +63,26 @@ class LoginRegisterService {
           "username": username,
           "email": email,
           "password": password,
-          "disabled": false
+          "disabled": false,
         }),
       );
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final username = json["user"];
-        final user_id = json["user_id"];
+        final userId = json["user_id"];
 
         // Eingeloggt sein merken
         final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
         await prefs.setBool('loggedIn', true);
         await prefs.setString('username', username);
-        await prefs.setInt('user_id', user_id);
+        await prefs.setInt('user_id', userId);
+
+        // Tracking Starten nach Login
+        await LocationTracker().startBatchTracking();
+        await LocationTracker().updatePolygonOnce(userId);
+        LocationTracker().startAutoPolygonUpdate(userId);
 
         return true;
       } else {
@@ -80,8 +95,11 @@ class LoginRegisterService {
     }
   }
 
-  // Logout Funktion
   Future<void> logout() async {
+    // Standort-Tracking & Polygon-Update stoppen
+    LocationTracker().stop();
+
+    // SharedPreferences leeren
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
