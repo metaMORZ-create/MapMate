@@ -30,7 +30,7 @@ class LoginRegisterService {
         await prefs.setInt('user_id', userId);
 
         // Tracking Starten nach Login
-        await LocationTracker().startBatchTracking();
+        await LocationTracker().startAllLocationTracking();
         await LocationTracker().updatePolygonOnce(userId);
         LocationTracker().startAutoPolygonUpdate(userId);
 
@@ -80,7 +80,7 @@ class LoginRegisterService {
         await prefs.setInt('user_id', userId);
 
         // Tracking Starten nach Login
-        await LocationTracker().startBatchTracking();
+        await LocationTracker().startAllLocationTracking();
         await LocationTracker().updatePolygonOnce(userId);
         LocationTracker().startAutoPolygonUpdate(userId);
 
