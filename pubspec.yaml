@@ -43,12 +43,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   http: ^1.2.1
   shared_preferences: ^2.2.2
-  background_locator_2:
-    path: lib_plugins/background_geolocator_2
-  background_location_tracker:
-    git:
-      url: https://github.com/icapps/flutter-background-location-tracker.git
-      ref: master
+  
   
 
 flutter_icons:

@@ -1,11 +1,9 @@
-import 'package:background_location_tracker/background_location_tracker.dart';
 import 'package:flutter/material.dart';
 import 'package:map_mates/pages/home_page.dart';
 import 'package:map_mates/pages/intro_page.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:map_mates/services/location_tracker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:map_mates/background/background_callback.dart';
 
 
 void main() async {
@@ -21,30 +19,10 @@ void main() async {
   // Automatische Polygon aktualisierung alle 5 Min
   // Nur wenn eingeloggt: Tracking starten + Polygon-Update
 
-  /* await BackgroundLocationTrackerManager.initialize(
-    backgroundCallback,
-    config: BackgroundLocationTrackerConfig(
-      loggingEnabled: true,
-      androidConfig: AndroidConfig(
-        distanceFilterMeters: 10,
-      ),
-      iOSConfig: IOSConfig(
-        activityType: ActivityType.NAVIGATION,
-        restartAfterKill: true,
-        distanceFilterMeters: 10,
-      ),
-    ),
-  ); */
-
   if (isLoggedIn && userId != null) {
     await LocationTracker().startBatchTracking();
     await LocationTracker().updatePolygonOnce(userId);
     LocationTracker().startAutoPolygonUpdate(userId);
-//    final isRunning = await BackgroundLocationTrackerManager.isTracking();
-//    if (isRunning) {
-//      await BackgroundLocationTrackerManager.startTracking();
-//      LocationTracker().startBackgroundUpload();
-//    } // alle 5min automatisch
   }
 
   runApp(MyApp(permissionGranted: permissionGranted, loggedIn: isLoggedIn));

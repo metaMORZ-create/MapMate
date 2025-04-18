@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
-import 'package:background_locator_2/background_locator.dart';
-import 'package:map_mates/services/background_tracking_service.dart';
 
 class LocationTracker {
   static final LocationTracker _instance = LocationTracker._internal();
@@ -23,20 +20,8 @@ class LocationTracker {
   final List<Map<String, dynamic>> _pendingVisited = [];
   Timer? _uploadTimer;
   Timer? _polygonTimer;
-  Timer? _bgUploadTimer;
   bool _trackingStarted = false;
   bool _polygonUpdaterStarted = false;
-
-  Future<void> initPlatformState() async {
-    await BackgroundLocator.initialize();
-  }
-
-//  void startBackgroundUpload() {
-//    _bgUploadTimer = Timer.periodic(
-//      const Duration(minutes: 2),
-//      (_) => BackgroundTrackingService.uploadStoredLocations(),
-//    );
-//  }
 
   Future<void> startBatchTracking({
     double minDistanceMeters = 10,
@@ -56,6 +41,7 @@ class LocationTracker {
 
     if (stream != null) {
       _subscription = stream.listen((pos) {
+        debugPrint("!!!! RECEIVED LOCATION $pos");
         _locationStreamController.add(pos);
         _lastEmittedLocation = pos;
 
@@ -121,8 +107,6 @@ class LocationTracker {
     _subscription?.cancel();
     _uploadTimer?.cancel();
     _polygonTimer?.cancel(); // Stoppe auch den Polygon-Timer
-//    _bgUploadTimer?.cancel();
-    await BackgroundLocator.unRegisterLocationUpdate();
     _locationStreamController.close();
   }
 
