@@ -1,18 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:isolate';
-import 'package:background_locator_2/settings/android_settings.dart';
-import 'package:background_locator_2/settings/ios_settings.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:map_mates/background/location_callback_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:background_locator_2/background_locator.dart';
-import 'package:background_locator_2/settings/locator_settings.dart';
-import 'package:map_mates/background/callback_dispatcher.dart';
-import 'package:background_locator_2/location_dto.dart';
+import 'package:map_mates/services/background_tracking_service.dart';
 
 class LocationTracker {
   static final LocationTracker _instance = LocationTracker._internal();
@@ -37,15 +31,16 @@ class LocationTracker {
     await BackgroundLocator.initialize();
   }
 
-  Future<void> startAllLocationTracking() async {
-    await startBatchTracking();
-    await startBackgroundLocator(); // ← das neue
-    startBackgroundUploader();
-  }
+//  void startBackgroundUpload() {
+//    _bgUploadTimer = Timer.periodic(
+//      const Duration(minutes: 2),
+//      (_) => BackgroundTrackingService.uploadStoredLocations(),
+//    );
+//  }
 
   Future<void> startBatchTracking({
     double minDistanceMeters = 10,
-    Duration uploadInterval = const Duration(seconds: 10),
+    Duration uploadInterval = const Duration(seconds: 60),
   }) async {
     if (_trackingStarted) return; // Bereits gestartet
     _trackingStarted = true; // Jetzt als aktiv markieren
@@ -122,77 +117,11 @@ class LocationTracker {
     }
   }
 
-  Future<void> startBackgroundLocatorAlt() async {
-    await BackgroundLocator.initialize(); // ← kein Parameter hier!
-    await BackgroundLocator.registerLocationUpdate(
-      LocationCallbackHandler.callback,
-      initCallback: LocationCallbackHandler.initCallback,
-      disposeCallback: LocationCallbackHandler.disposeCallback,
-      iosSettings: IOSSettings(
-        accuracy: LocationAccuracy.NAVIGATION,
-        distanceFilter: 10,
-        stopWithTerminate: false,
-        showsBackgroundLocationIndicator: true,
-      ),
-      autoStop: false,
-      androidSettings: AndroidSettings(
-        accuracy: LocationAccuracy.NAVIGATION,
-        interval: 10,
-        distanceFilter: 10,
-        client: LocationClient.google,
-        androidNotificationSettings: AndroidNotificationSettings(
-          notificationChannelName: 'Location tracking',
-          notificationTitle: 'MapMates läuft im Hintergrund',
-          notificationMsg: 'Standort wird aktualisiert',
-          notificationBigMsg: 'MapMates zeichnet deinen Standort auf...',
-          notificationIcon: '',
-        ),
-      ),
-    );
-  }
-
-  Future<void> startBackgroundLocator() async {
-    await BackgroundLocator.initialize();
-    callbackDispatcher();
-  }
-
-  Future<void> stopBackgroundLocator() async {
-    await BackgroundLocator.unRegisterLocationUpdate();
-  }
-
-  void startBackgroundUploader({
-    Duration interval = const Duration(minutes: 1),
-  }) {
-    _bgUploadTimer?.cancel(); // falls mehrfach gestartet
-    _bgUploadTimer = Timer.periodic(interval, (_) async {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getInt("user_id");
-      if (userId == null) return;
-
-      final List<String> stored = prefs.getStringList("bg_locations") ?? [];
-
-      if (stored.isEmpty) return;
-
-      final List<Map<String, dynamic>> batch =
-          stored.map((e) => Map<String, dynamic>.from(jsonDecode(e))).toList();
-
-      try {
-        await LocationService.uploadBatchVisitedZones(batch);
-        await LocationService.uploadBatchLocations(batch);
-
-        await prefs.remove("bg_locations");
-        debugPrint("🔁 Hintergrund-Standorte hochgeladen.");
-      } catch (e) {
-        debugPrint("❌ Fehler beim Senden der BG-Daten: $e");
-      }
-    });
-  }
-
   void stop() async {
     _subscription?.cancel();
     _uploadTimer?.cancel();
     _polygonTimer?.cancel(); // Stoppe auch den Polygon-Timer
-    _bgUploadTimer?.cancel();
+//    _bgUploadTimer?.cancel();
     await BackgroundLocator.unRegisterLocationUpdate();
     _locationStreamController.close();
   }

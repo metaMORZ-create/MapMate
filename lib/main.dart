@@ -1,15 +1,12 @@
-import 'dart:isolate';
-import 'dart:ui';
-
-import 'package:background_locator_2/background_locator.dart';
+import 'package:background_location_tracker/background_location_tracker.dart';
 import 'package:flutter/material.dart';
-import 'package:map_mates/background/background_location_repository.dart';
 import 'package:map_mates/pages/home_page.dart';
 import 'package:map_mates/pages/intro_page.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:map_mates/services/location_tracker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:map_mates/background/location_callback_handler.dart';
+import 'package:map_mates/background/background_callback.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,17 +20,37 @@ void main() async {
 
   // Automatische Polygon aktualisierung alle 5 Min
   // Nur wenn eingeloggt: Tracking starten + Polygon-Update
+
+  /* await BackgroundLocationTrackerManager.initialize(
+    backgroundCallback,
+    config: BackgroundLocationTrackerConfig(
+      loggingEnabled: true,
+      androidConfig: AndroidConfig(
+        distanceFilterMeters: 10,
+      ),
+      iOSConfig: IOSConfig(
+        activityType: ActivityType.NAVIGATION,
+        restartAfterKill: true,
+        distanceFilterMeters: 10,
+      ),
+    ),
+  ); */
+
   if (isLoggedIn && userId != null) {
-    await LocationTracker().startAllLocationTracking();
+    await LocationTracker().startBatchTracking();
     await LocationTracker().updatePolygonOnce(userId);
-    LocationTracker().startAutoPolygonUpdate(userId); // alle 5min automatisch
+    LocationTracker().startAutoPolygonUpdate(userId);
+//    final isRunning = await BackgroundLocationTrackerManager.isTracking();
+//    if (isRunning) {
+//      await BackgroundLocationTrackerManager.startTracking();
+//      LocationTracker().startBackgroundUpload();
+//    } // alle 5min automatisch
   }
 
   runApp(MyApp(permissionGranted: permissionGranted, loggedIn: isLoggedIn));
 }
 
 class MyApp extends StatefulWidget {
-  static const String _isolateName = "LocatorIsolate";
   final bool permissionGranted;
   final bool loggedIn;
 
@@ -48,18 +65,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final backgroundRepo = BackgroundLocationRepository();
-
-  @override
-  void initState() {
-    super.initState();
-    backgroundRepo.initialize();
-  }
-
-  Future<void> initPlatformState() async {
-    await BackgroundLocator.initialize();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
