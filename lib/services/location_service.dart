@@ -46,8 +46,8 @@ class LocationService {
         : AppleSettings(
             accuracy: LocationAccuracy.high,
             activityType: ActivityType.fitness,
-            pauseLocationUpdatesAutomatically: true,
-            showBackgroundLocationIndicator: false,
+            pauseLocationUpdatesAutomatically: false,
+            showBackgroundLocationIndicator: true,
             distanceFilter: 10,
           );
 
