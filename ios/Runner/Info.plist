@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Diese App verfolgt deinen Standort, auch wenn sie im Hintergrund läuft.</string
+	<string>Diese App verfolgt deinen Standort, auch wenn sie im Hintergrund läuft.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Diese App benötigt deinen Standort, um dich auf der Karte anzuzeigen.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

@@ -28,7 +28,6 @@ class _MapPageState extends State<MapPage> {
   // FUNKTIONEN
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadUserId();
   }
