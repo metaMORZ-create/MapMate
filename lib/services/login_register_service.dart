@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:map_mates/services/location_tracker.dart';
-import 'package:latlong2/latlong.dart';
 
 class LoginRegisterService {
   final http.Client client;

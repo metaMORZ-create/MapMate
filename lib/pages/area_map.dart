@@ -3,7 +3,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_mates/services/location_service.dart';
 import 'package:map_mates/services/location_tracker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class VisitedAreaPage extends StatefulWidget {
   final int userId;
@@ -20,7 +19,6 @@ class _VisitedAreaPageState extends State<VisitedAreaPage> {
 
   LatLng? _currentLocation;
   List<List<LatLng>> _visitedPolygon = [];
-  bool _mapReady = false;
   LatLng? pos;
 
   final List<LatLng> outerPolygon = [
@@ -88,7 +86,6 @@ class _VisitedAreaPageState extends State<VisitedAreaPage> {
         options: MapOptions(
           initialZoom: 14,
           onMapReady: () {
-            _mapReady = true;
             _initializeMap();
           },
         ),
