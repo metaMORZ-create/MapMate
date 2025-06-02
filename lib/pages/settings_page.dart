@@ -66,6 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   await LoginRegisterService(Client()).logout();
                   final permissionGranted =
                       await LocationService.checkAndRequestLocationPermission();
+                  if (!context.mounted) return;
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(

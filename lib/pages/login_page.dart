@@ -21,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
       final password = _passwordController.text.trim();
       // Login überprüfen und ggf. weiterleiten
       final success = await LoginRegisterService(Client()).login(username, password);
+      if (!mounted) return;
       if (success) {
         Navigator.pushReplacement(
           context,

@@ -23,6 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final password = _passwordController.text.trim();
       // Login überprüfen und ggf. weiterleiten
       final success = await LoginRegisterService(Client()).register(email, username, password);
+      if (!mounted) return;
       if (success) {
         Navigator.pushReplacement(
           context,

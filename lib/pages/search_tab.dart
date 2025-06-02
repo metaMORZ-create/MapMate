@@ -12,8 +12,8 @@ class SearchTab extends StatefulWidget {
 }
 
 class _SearchTabState extends State<SearchTab> {
-  List results_list = [];
-  List user_list = [];
+  List resultsList = [];
+  List userList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +25,10 @@ class _SearchTabState extends State<SearchTab> {
           children: [
             TextField(
               onChanged: (search) async {
-                results_list = await SocialService(Client()).search(search);
+                resultsList = await SocialService(Client()).search(search);
                 if (!mounted) return;
                 setState(() {
-                  user_list = results_list;
+                  userList = resultsList;
                 });
               },
               decoration: InputDecoration(
@@ -49,10 +49,10 @@ class _SearchTabState extends State<SearchTab> {
             const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
-                itemCount: user_list.length,
+                itemCount: userList.length,
                 itemBuilder: (context, index) {
-                  final eintrag = user_list[index]["username"];
-                  final user = user_list[index];
+                  final eintrag = userList[index]["username"];
+                  final user = userList[index];
                   Widget trailingIcon;
 
                   if (user["already_friends"] == true) {
