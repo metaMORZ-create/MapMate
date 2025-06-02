@@ -93,9 +93,9 @@ class _SearchTabState extends State<SearchTab> {
                   } else {
                     trailingIcon = GestureDetector(
                       onTap: () async {
-                        final success = await SocialService(Client()).sendFriendRequest(
-                          user["id"],
-                        );
+                        final success = await SocialService(
+                          Client(),
+                        ).sendFriendRequest(user["id"]);
                         if (success) {
                           if (!mounted) return;
                           setState(() {

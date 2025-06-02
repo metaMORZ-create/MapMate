@@ -36,7 +36,12 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: Colors.grey[300],
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.only(top: 50, left: 10, right: 10, bottom: 20),
+          padding: const EdgeInsets.only(
+            top: 50,
+            left: 10,
+            right: 10,
+            bottom: 20,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

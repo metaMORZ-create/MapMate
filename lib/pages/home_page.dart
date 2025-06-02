@@ -32,7 +32,6 @@ class _HomePageState extends State<HomePage> {
 
     //cart page
     const SettingsPage(),
-
   ];
 
   @override

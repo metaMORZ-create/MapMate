@@ -119,7 +119,11 @@ class _MapPageState extends State<MapPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => VisitedAreaPage(userId: _userId!, userName: _userName!,),
+                      builder:
+                          (_) => VisitedAreaPage(
+                            userId: _userId!,
+                            userName: _userName!,
+                          ),
                     ),
                   );
                 },

@@ -187,12 +187,11 @@ void main() {
 
   group("logout", () {
     test("Logout", () async {
-
       // Set-Up
       SharedPreferences.setMockInitialValues({
-      'loggedIn': true,
-      'username': 'testuser',
-      'user_id': 1,
+        'loggedIn': true,
+        'username': 'testuser',
+        'user_id': 1,
       });
 
       // Ausführung

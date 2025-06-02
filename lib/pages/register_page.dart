@@ -22,7 +22,9 @@ class _RegisterPageState extends State<RegisterPage> {
       final username = _usernameController.text.trim();
       final password = _passwordController.text.trim();
       // Login überprüfen und ggf. weiterleiten
-      final success = await LoginRegisterService(Client()).register(email, username, password);
+      final success = await LoginRegisterService(
+        Client(),
+      ).register(email, username, password);
       if (!mounted) return;
       if (success) {
         Navigator.pushReplacement(
@@ -30,9 +32,9 @@ class _RegisterPageState extends State<RegisterPage> {
           MaterialPageRoute(builder: (_) => const HomePage()),
         );
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Registrierung fehlgeschlagen")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Registrierung fehlgeschlagen")),
+        );
       }
     }
   }
@@ -57,9 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     TextFormField(
                       controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: "E-Mail",
-                      ),
+                      decoration: const InputDecoration(labelText: "E-Mail"),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Bitte E-Mail eingeben";
@@ -70,7 +70,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 15),
                     TextFormField(
                       controller: _usernameController,
-                      decoration: const InputDecoration(labelText: "Benutzername"),
+                      decoration: const InputDecoration(
+                        labelText: "Benutzername",
+                      ),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {

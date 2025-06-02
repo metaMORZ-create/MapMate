@@ -11,10 +11,9 @@ class FriendsTab extends StatefulWidget {
 }
 
 class _FriendsTabState extends State<FriendsTab> {
-
   late List friendsList = [];
 
-   @override
+  @override
   void initState() {
     super.initState();
     loadData();
@@ -22,7 +21,7 @@ class _FriendsTabState extends State<FriendsTab> {
 
   Future<void> loadData() async {
     final friends = await SocialService(Client()).getFriends();
-    if (!mounted) return; 
+    if (!mounted) return;
     setState(() {
       friendsList = friends;
     });
@@ -45,7 +44,11 @@ class _FriendsTabState extends State<FriendsTab> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => VisitedAreaPage(userId: friend["friend_id"], userName: friend["friend_username"],),
+                  builder:
+                      (_) => VisitedAreaPage(
+                        userId: friend["friend_id"],
+                        userName: friend["friend_username"],
+                      ),
                 ),
               );
             },

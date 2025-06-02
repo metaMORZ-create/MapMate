@@ -5,7 +5,6 @@ import 'package:map_mates/services/location_service.dart';
 import 'package:map_mates/services/location_tracker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();

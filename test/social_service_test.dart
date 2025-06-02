@@ -24,12 +24,14 @@ void main() {
       const query = "anna";
       final fakeResponse = [
         {"id": 1, "username": "Anna"},
-        {"id": 2, "username": "Annabelle"}
+        {"id": 2, "username": "Annabelle"},
       ];
 
       when(
         () => mockHTTPClient.get(
-          Uri.parse("https://map-mates-profile-api-production.up.railway.app/socials/search?query=$query&self_id=42"),
+          Uri.parse(
+            "https://map-mates-profile-api-production.up.railway.app/socials/search?query=$query&self_id=42",
+          ),
           headers: any(named: "headers"),
         ),
       ).thenAnswer((_) async => Response(jsonEncode(fakeResponse), 200));
@@ -43,7 +45,9 @@ void main() {
     test("sendFriendRequest returns true", () async {
       when(
         () => mockHTTPClient.post(
-          Uri.parse("https://map-mates-profile-api-production.up.railway.app/socials/send_request"),
+          Uri.parse(
+            "https://map-mates-profile-api-production.up.railway.app/socials/send_request",
+          ),
           headers: any(named: "headers"),
           body: any(named: "body"),
         ),
@@ -59,7 +63,9 @@ void main() {
     test("acceptFriendRequest returns true", () async {
       when(
         () => mockHTTPClient.post(
-          Uri.parse("https://map-mates-profile-api-production.up.railway.app/socials/accept_request"),
+          Uri.parse(
+            "https://map-mates-profile-api-production.up.railway.app/socials/accept_request",
+          ),
           headers: any(named: "headers"),
           body: any(named: "body"),
         ),
@@ -75,7 +81,9 @@ void main() {
     test("denyFriendRequest returns true", () async {
       when(
         () => mockHTTPClient.post(
-          Uri.parse("https://map-mates-profile-api-production.up.railway.app/socials/deny_request"),
+          Uri.parse(
+            "https://map-mates-profile-api-production.up.railway.app/socials/deny_request",
+          ),
           headers: any(named: "headers"),
           body: any(named: "body"),
         ),
@@ -95,7 +103,9 @@ void main() {
 
       when(
         () => mockHTTPClient.get(
-          Uri.parse("https://map-mates-profile-api-production.up.railway.app/socials/outgoing_requests/42"),
+          Uri.parse(
+            "https://map-mates-profile-api-production.up.railway.app/socials/outgoing_requests/42",
+          ),
           headers: any(named: "headers"),
         ),
       ).thenAnswer((_) async => Response(jsonEncode(fakeResponse), 200));
@@ -113,7 +123,9 @@ void main() {
 
       when(
         () => mockHTTPClient.get(
-          Uri.parse("https://map-mates-profile-api-production.up.railway.app/socials/received_requests/42"),
+          Uri.parse(
+            "https://map-mates-profile-api-production.up.railway.app/socials/received_requests/42",
+          ),
           headers: any(named: "headers"),
         ),
       ).thenAnswer((_) async => Response(jsonEncode(fakeResponse), 200));
@@ -131,7 +143,9 @@ void main() {
 
       when(
         () => mockHTTPClient.get(
-          Uri.parse("https://map-mates-profile-api-production.up.railway.app/socials/get_friends/42"),
+          Uri.parse(
+            "https://map-mates-profile-api-production.up.railway.app/socials/get_friends/42",
+          ),
           headers: any(named: "headers"),
         ),
       ).thenAnswer((_) async => Response(jsonEncode(fakeResponse), 200));

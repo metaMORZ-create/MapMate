@@ -25,14 +25,13 @@ class ProfilesPage extends StatelessWidget {
               Tab(text: "Friend Requests"),
             ],
           ),
-          title: const Text("Your Friends", style: TextStyle(color: Colors.black)),
+          title: const Text(
+            "Your Friends",
+            style: TextStyle(color: Colors.black),
+          ),
         ),
         body: const TabBarView(
-          children: [
-            FriendsTab(),
-            SearchTab(),
-            FriendRequestsTab(),
-          ],
+          children: [FriendsTab(), SearchTab(), FriendRequestsTab()],
         ),
       ),
     );

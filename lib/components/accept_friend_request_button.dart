@@ -16,7 +16,9 @@ class AcceptFriendButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        final success = await SocialService(Client()).acceptFriendRequest(userId);
+        final success = await SocialService(
+          Client(),
+        ).acceptFriendRequest(userId);
         if (success) {
           onAccepted(); // ruft setState im Parent auf
         }

@@ -8,7 +8,11 @@ class VisitedAreaPage extends StatefulWidget {
   final int userId;
   final String userName;
 
-  const VisitedAreaPage({super.key, required this.userId, required this.userName});
+  const VisitedAreaPage({
+    super.key,
+    required this.userId,
+    required this.userName,
+  });
 
   @override
   State<VisitedAreaPage> createState() => _VisitedAreaPageState();
@@ -64,21 +68,26 @@ class _VisitedAreaPageState extends State<VisitedAreaPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Center(child: Text("${widget.userName} Visited Areas", style: TextStyle(color: Colors.white, fontSize: 14),)),
+        title: Center(
+          child: Text(
+            "${widget.userName} Visited Areas",
+            style: TextStyle(color: Colors.white, fontSize: 14),
+          ),
+        ),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back, color: Colors.white,),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
         actions: [
           IconButton(
             onPressed: () async {
               LocationTracker().updatePolygonOnce(widget.userId);
               _initializeMap();
-            }, 
-            icon: Icon(Icons.refresh, color: Colors.white,)
-            )
+            },
+            icon: Icon(Icons.refresh, color: Colors.white),
+          ),
         ],
       ),
       body: FlutterMap(

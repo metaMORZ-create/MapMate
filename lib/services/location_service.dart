@@ -33,23 +33,24 @@ class LocationService {
     int distanceFilter = 10,
   }) async {
     if (!await checkAndRequestLocationPermission()) return null;
-     final LocationSettings locationSettings = Platform.isAndroid
-        ? AndroidSettings(
-            accuracy: LocationAccuracy.high,
-            distanceFilter: 10,
-            foregroundNotificationConfig: const ForegroundNotificationConfig(
-              notificationTitle: 'MapMates Standort-Tracking',
-              notificationText: 'Dein Standort wird im Hintergrund verfolgt',
-              enableWakeLock: true,
-            ),
-          )
-        : AppleSettings(
-            accuracy: LocationAccuracy.high,
-            activityType: ActivityType.fitness,
-            pauseLocationUpdatesAutomatically: false,
-            showBackgroundLocationIndicator: true,
-            distanceFilter: 10,
-          );
+    final LocationSettings locationSettings =
+        Platform.isAndroid
+            ? AndroidSettings(
+              accuracy: LocationAccuracy.high,
+              distanceFilter: 10,
+              foregroundNotificationConfig: const ForegroundNotificationConfig(
+                notificationTitle: 'MapMates Standort-Tracking',
+                notificationText: 'Dein Standort wird im Hintergrund verfolgt',
+                enableWakeLock: true,
+              ),
+            )
+            : AppleSettings(
+              accuracy: LocationAccuracy.high,
+              activityType: ActivityType.fitness,
+              pauseLocationUpdatesAutomatically: false,
+              showBackgroundLocationIndicator: true,
+              distanceFilter: 10,
+            );
 
     return Geolocator.getPositionStream(locationSettings: locationSettings).map(
       (Position position) {

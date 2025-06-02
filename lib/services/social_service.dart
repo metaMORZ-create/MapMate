@@ -12,7 +12,8 @@ class SocialService {
   Future<List<Map<String, dynamic>>> search(String search) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    final url = "https://map-mates-profile-api-production.up.railway.app/socials/search?query=$search&self_id=$userId";
+    final url =
+        "https://map-mates-profile-api-production.up.railway.app/socials/search?query=$search&self_id=$userId";
 
     try {
       final response = await client.get(
@@ -35,7 +36,8 @@ class SocialService {
 
   // Freundschaftsanfrage senden
   Future<bool> sendFriendRequest(int receiverId) async {
-    const url = "https://map-mates-profile-api-production.up.railway.app/socials/send_request";
+    const url =
+        "https://map-mates-profile-api-production.up.railway.app/socials/send_request";
     final prefs = await SharedPreferences.getInstance();
     final senderId = prefs.getInt("user_id");
 
@@ -43,10 +45,7 @@ class SocialService {
       final response = await client.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "sender_id": senderId,
-          "receiver_id": receiverId,
-        }),
+        body: jsonEncode({"sender_id": senderId, "receiver_id": receiverId}),
       );
 
       if (response.statusCode == 200) {
@@ -66,7 +65,8 @@ class SocialService {
 
   // Freundschaftsanfrage annehmen
   Future<bool> acceptFriendRequest(int senderUserId) async {
-    const url = "https://map-mates-profile-api-production.up.railway.app/socials/accept_request";
+    const url =
+        "https://map-mates-profile-api-production.up.railway.app/socials/accept_request";
     final prefs = await SharedPreferences.getInstance();
     final selfUserId = prefs.getInt("user_id");
 
@@ -97,7 +97,8 @@ class SocialService {
 
   // Freundschaftsanfrage ablehnen
   Future<bool> denyFriendRequest(int senderUserId) async {
-    const url = "https://map-mates-profile-api-production.up.railway.app/socials/deny_request";
+    const url =
+        "https://map-mates-profile-api-production.up.railway.app/socials/deny_request";
     final prefs = await SharedPreferences.getInstance();
     final selfUserId = prefs.getInt("user_id");
 
@@ -130,7 +131,8 @@ class SocialService {
   Future<List<Map<String, dynamic>>> getOutgoingRequests() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    final url = "https://map-mates-profile-api-production.up.railway.app/socials/outgoing_requests/$userId";
+    final url =
+        "https://map-mates-profile-api-production.up.railway.app/socials/outgoing_requests/$userId";
 
     try {
       final response = await client.get(
@@ -155,7 +157,8 @@ class SocialService {
   Future<List<Map<String, dynamic>>> getIncomingRequests() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    final url = "https://map-mates-profile-api-production.up.railway.app/socials/received_requests/$userId";
+    final url =
+        "https://map-mates-profile-api-production.up.railway.app/socials/received_requests/$userId";
 
     try {
       final response = await client.get(
@@ -167,7 +170,9 @@ class SocialService {
         final List<dynamic> jsonList = jsonDecode(response.body);
         return jsonList.cast<Map<String, dynamic>>();
       } else {
-        debugPrint("Empfangene Anfragen fehlgeschlagen: ${response.statusCode}");
+        debugPrint(
+          "Empfangene Anfragen fehlgeschlagen: ${response.statusCode}",
+        );
         return [];
       }
     } catch (e) {
@@ -180,7 +185,8 @@ class SocialService {
   Future<List<Map<String, dynamic>>> getFriends() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    final url = "https://map-mates-profile-api-production.up.railway.app/socials/get_friends/$userId";
+    final url =
+        "https://map-mates-profile-api-production.up.railway.app/socials/get_friends/$userId";
 
     try {
       final response = await client.get(

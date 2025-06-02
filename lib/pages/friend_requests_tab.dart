@@ -24,7 +24,7 @@ class _FriendRequestsTabState extends State<FriendRequestsTab> {
   Future<void> loadData() async {
     final outgoing = await SocialService(Client()).getOutgoingRequests();
     final incoming = await SocialService(Client()).getIncomingRequests();
-    if (!mounted) return; 
+    if (!mounted) return;
     setState(() {
       outgoingList = outgoing;
       incomingList = incoming;
@@ -46,7 +46,7 @@ class _FriendRequestsTabState extends State<FriendRequestsTab> {
           IncomingRequests(
             requests: incomingList.cast<Map<String, dynamic>>(),
             onHandled: (index) {
-              if (!mounted) return; 
+              if (!mounted) return;
               setState(() {
                 incomingList.removeAt(index);
               });
@@ -61,7 +61,7 @@ class _FriendRequestsTabState extends State<FriendRequestsTab> {
           OutgoingRequests(
             requests: outgoingList.cast<Map<String, dynamic>>(),
             onCancelled: (index) {
-              if (!mounted) return; 
+              if (!mounted) return;
               setState(() {
                 outgoingList.removeAt(index);
               });
