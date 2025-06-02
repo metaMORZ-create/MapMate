@@ -1,27 +1,28 @@
 import "dart:convert";
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import "package:flutter/cupertino.dart";
-import "package:http/http.dart" as http;
 
 class SocialService {
+  final http.Client client;
+
+  SocialService(this.client);
+
   // Suche nach Nutzern
-  static Future<List<Map<String, dynamic>>> search(String search) async {
+  Future<List<Map<String, dynamic>>> search(String search) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    String url = "https://map-mates-profile-api-production.up.railway.app/socials/search?query=$search&self_id=$userId";
-    
+    final url = "https://map-mates-profile-api-production.up.railway.app/socials/search?query=$search&self_id=$userId";
+
     try {
-      final response = await http.get(
+      final response = await client.get(
         Uri.parse(url),
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        final List<Map<String, dynamic>> users = jsonList.cast<Map<String, dynamic>>();
-
-        return users;
-
+        return jsonList.cast<Map<String, dynamic>>();
       } else {
         debugPrint("Suche fehlgeschlagen: ${response.statusCode}");
         return [];
@@ -32,14 +33,14 @@ class SocialService {
     }
   }
 
-  // send friend_request
-  static Future<bool> sendFriendRequest(int receiverId) async {
+  // Freundschaftsanfrage senden
+  Future<bool> sendFriendRequest(int receiverId) async {
     const url = "https://map-mates-profile-api-production.up.railway.app/socials/send_request";
     final prefs = await SharedPreferences.getInstance();
     final senderId = prefs.getInt("user_id");
 
     try {
-      final response = await http.post(
+      final response = await client.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
@@ -50,27 +51,27 @@ class SocialService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        debugPrint("✅ Anfrage erfolgreich: ${data['message']}");
+        debugPrint("Anfrage erfolgreich: ${data['message']}");
         return true;
       } else {
         final error = jsonDecode(response.body);
-        debugPrint("⚠️ Fehler: ${error['detail']}");
+        debugPrint("Fehler: ${error['detail']}");
         return false;
       }
     } catch (e) {
-      debugPrint("❌ Ausnahme beim Senden der Anfrage: $e");
+      debugPrint("Ausnahme beim Senden der Anfrage: $e");
       return false;
     }
   }
 
-  // Accept friend request
-  static Future<bool> acceptFriendRequest(int senderUserId) async {
+  // Freundschaftsanfrage annehmen
+  Future<bool> acceptFriendRequest(int senderUserId) async {
     const url = "https://map-mates-profile-api-production.up.railway.app/socials/accept_request";
     final prefs = await SharedPreferences.getInstance();
     final selfUserId = prefs.getInt("user_id");
 
     try {
-      final response = await http.post(
+      final response = await client.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
@@ -81,26 +82,27 @@ class SocialService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        debugPrint("✅ Anfrage erfolgreich: ${data['message']}");
+        debugPrint("Anfrage erfolgreich: ${data['message']}");
         return true;
       } else {
         final error = jsonDecode(response.body);
-        debugPrint("⚠️ Fehler: ${error['detail']}");
+        debugPrint("Fehler: ${error['detail']}");
         return false;
       }
     } catch (e) {
-      debugPrint("❌ Ausnahme beim Senden der Anfrage: $e");
+      debugPrint("Ausnahme beim Annehmen: $e");
       return false;
     }
   }
-  // Deny Friend Request
-  static Future<bool> denyFriendRequest(int senderUserId) async {
+
+  // Freundschaftsanfrage ablehnen
+  Future<bool> denyFriendRequest(int senderUserId) async {
     const url = "https://map-mates-profile-api-production.up.railway.app/socials/deny_request";
     final prefs = await SharedPreferences.getInstance();
     final selfUserId = prefs.getInt("user_id");
 
     try {
-      final response = await http.post(
+      final response = await client.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
@@ -111,99 +113,90 @@ class SocialService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        debugPrint("✅ Anfrage erfolgreich: ${data['message']}");
+        debugPrint("Anfrage erfolgreich: ${data['message']}");
         return true;
       } else {
         final error = jsonDecode(response.body);
-        debugPrint("⚠️ Fehler: ${error['detail']}");
+        debugPrint("Fehler: ${error['detail']}");
         return false;
       }
     } catch (e) {
-      debugPrint("❌ Ausnahme beim Senden der Anfrage: $e");
+      debugPrint("Ausnahme beim Ablehnen: $e");
       return false;
     }
   }
 
-  // Outgoing Friend Requests
-  static Future<List<Map<String, dynamic>>> getOutgoingRequests() async {
+  // Ausgehende Anfragen abrufen
+  Future<List<Map<String, dynamic>>> getOutgoingRequests() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    String url = "https://map-mates-profile-api-production.up.railway.app/socials/outgoing_requests/$userId";
-    
+    final url = "https://map-mates-profile-api-production.up.railway.app/socials/outgoing_requests/$userId";
+
     try {
-      final response = await http.get(
+      final response = await client.get(
         Uri.parse(url),
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        final List<Map<String, dynamic>> users = jsonList.cast<Map<String, dynamic>>();
-
-        return users;
-
+        return jsonList.cast<Map<String, dynamic>>();
       } else {
-        debugPrint("Suche fehlgeschlagen: ${response.statusCode}");
+        debugPrint("Anfragen holen fehlgeschlagen: ${response.statusCode}");
         return [];
       }
     } catch (e) {
-      debugPrint("Fehler bei Suche: $e");
+      debugPrint("Fehler beim Abrufen ausgehender Anfragen: $e");
       return [];
     }
   }
 
-  // Incoming Friend Requests
-  static Future<List<Map<String, dynamic>>> getIncomingRequests() async {
+  // Eingehende Anfragen abrufen
+  Future<List<Map<String, dynamic>>> getIncomingRequests() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    String url = "https://map-mates-profile-api-production.up.railway.app/socials/received_requests/$userId";
-    
+    final url = "https://map-mates-profile-api-production.up.railway.app/socials/received_requests/$userId";
+
     try {
-      final response = await http.get(
+      final response = await client.get(
         Uri.parse(url),
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        final List<Map<String, dynamic>> users = jsonList.cast<Map<String, dynamic>>();
-
-        return users;
-
+        return jsonList.cast<Map<String, dynamic>>();
       } else {
-        debugPrint("Suche fehlgeschlagen: ${response.statusCode}");
+        debugPrint("Empfangene Anfragen fehlgeschlagen: ${response.statusCode}");
         return [];
       }
     } catch (e) {
-      debugPrint("Fehler bei Suche: $e");
+      debugPrint("Fehler beim Abrufen eingehender Anfragen: $e");
       return [];
     }
   }
 
-  // Incoming Friend Requests
-  static Future<List<Map<String, dynamic>>> getFriends() async {
+  // Freundesliste abrufen
+  Future<List<Map<String, dynamic>>> getFriends() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt("user_id");
-    String url = "https://map-mates-profile-api-production.up.railway.app/socials/get_friends/$userId";
-    
+    final url = "https://map-mates-profile-api-production.up.railway.app/socials/get_friends/$userId";
+
     try {
-      final response = await http.get(
+      final response = await client.get(
         Uri.parse(url),
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        final List<Map<String, dynamic>> users = jsonList.cast<Map<String, dynamic>>();
-
-        return users;
-
+        return jsonList.cast<Map<String, dynamic>>();
       } else {
-        debugPrint("Suche fehlgeschlagen: ${response.statusCode}");
+        debugPrint("Freundesliste fehlgeschlagen: ${response.statusCode}");
         return [];
       }
     } catch (e) {
-      debugPrint("Fehler bei Suche: $e");
+      debugPrint("Fehler beim Abrufen der Freunde: $e");
       return [];
     }
   }

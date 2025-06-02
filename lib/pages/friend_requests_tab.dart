@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:map_mates/components/incoming_requests.dart';
 import 'package:map_mates/components/outgoing_requests.dart';
 import 'package:map_mates/services/social_service.dart';
@@ -21,8 +22,8 @@ class _FriendRequestsTabState extends State<FriendRequestsTab> {
   }
 
   Future<void> loadData() async {
-    final outgoing = await SocialService.getOutgoingRequests();
-    final incoming = await SocialService.getIncomingRequests();
+    final outgoing = await SocialService(Client()).getOutgoingRequests();
+    final incoming = await SocialService(Client()).getIncomingRequests();
     if (!mounted) return; 
     setState(() {
       outgoingList = outgoing;

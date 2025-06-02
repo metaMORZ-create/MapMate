@@ -1,17 +1,25 @@
-import "dart:convert";
-import "package:map_mates/services/location_tracker.dart";
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import "package:flutter/cupertino.dart";
-import "package:http/http.dart" as http;
+import 'package:map_mates/services/location_tracker.dart';
+import 'package:latlong2/latlong.dart';
 
 class LoginRegisterService {
-  // Login Verifizierung
-  static Future<bool> login(String username, String password) async {
+  final http.Client client;
+
+  LoginRegisterService(this.client);
+
+  Future<bool> login(
+    String username,
+    String password, {
+    bool skipTracking = false,
+  }) async {
     const url =
         "https://map-mates-profile-api-production.up.railway.app/users/login";
 
     try {
-      final response = await http.post(
+      final response = await client.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"username": username, "password": password}),
@@ -22,18 +30,17 @@ class LoginRegisterService {
         final username = json["user"];
         final userId = json["user_id"];
 
-        // Eingeloggt sein merken
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
         await prefs.setBool('loggedIn', true);
         await prefs.setString('username', username);
         await prefs.setInt('user_id', userId);
 
-        // Tracking Starten nach Login
-        await LocationTracker().startBatchTracking();
-        await LocationTracker().updatePolygonOnce(userId);
-        LocationTracker().startAutoPolygonUpdate(userId);
-
+        if (!skipTracking) {
+          await LocationTracker().startBatchTracking();
+          await LocationTracker().updatePolygonOnce(userId);
+          LocationTracker().startAutoPolygonUpdate(userId);
+        }
 
         return true;
       } else {
@@ -46,17 +53,17 @@ class LoginRegisterService {
     }
   }
 
-  // Login Verifizierung
-  static Future<bool> register(
+  Future<bool> register(
     String email,
     String username,
-    String password,
-  ) async {
+    String password, {
+    bool skipTracking = false,
+  }) async {
     const url =
         "https://map-mates-profile-api-production.up.railway.app/users/register";
 
     try {
-      final response = await http.post(
+      final response = await client.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
@@ -72,34 +79,33 @@ class LoginRegisterService {
         final username = json["user"];
         final userId = json["user_id"];
 
-        // Eingeloggt sein merken
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
         await prefs.setBool('loggedIn', true);
         await prefs.setString('username', username);
         await prefs.setInt('user_id', userId);
 
-        // Tracking Starten nach Login
-        await LocationTracker().startBatchTracking();
-        await LocationTracker().updatePolygonOnce(userId);
-        LocationTracker().startAutoPolygonUpdate(userId);
+        if (!skipTracking) {
+          await LocationTracker().startBatchTracking();
+          await LocationTracker().updatePolygonOnce(userId);
+          LocationTracker().startAutoPolygonUpdate(userId);
+        }
 
         return true;
       } else {
-        debugPrint("Login Fehlgeschlagen");
+        debugPrint("Registrierung fehlgeschlagen");
         return false;
       }
     } catch (e) {
-      debugPrint("Fehler beim Login: $e");
+      debugPrint("Fehler bei Registrierung: $e");
       return false;
     }
   }
 
-  Future<void> logout() async {
-    // Standort-Tracking & Polygon-Update stoppen
-    LocationTracker().stop();
-
-    // SharedPreferences leeren
+  Future<void> logout({bool skipTracking = false}) async {
+    if (!skipTracking) {
+      LocationTracker().stop();
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }

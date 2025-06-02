@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:http/http.dart";
 import "package:map_mates/pages/intro_page.dart";
 import "package:map_mates/services/location_service.dart";
 import "package:map_mates/services/login_register_service.dart";
@@ -62,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  await LoginRegisterService().logout();
+                  await LoginRegisterService(Client()).logout();
                   final permissionGranted =
                       await LocationService.checkAndRequestLocationPermission();
                   Navigator.pushAndRemoveUntil(

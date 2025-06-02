@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:map_mates/services/social_service.dart';
 
 class AcceptFriendButton extends StatelessWidget {
@@ -15,7 +16,7 @@ class AcceptFriendButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        final success = await SocialService.acceptFriendRequest(userId);
+        final success = await SocialService(Client()).acceptFriendRequest(userId);
         if (success) {
           onAccepted(); // ruft setState im Parent auf
         }

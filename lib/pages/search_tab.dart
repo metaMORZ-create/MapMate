@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:map_mates/components/accept_friend_request_button.dart';
 import 'package:map_mates/components/deny_friend_request_button.dart';
 import 'package:map_mates/services/social_service.dart';
@@ -24,7 +25,7 @@ class _SearchTabState extends State<SearchTab> {
           children: [
             TextField(
               onChanged: (search) async {
-                results_list = await SocialService.search(search);
+                results_list = await SocialService(Client()).search(search);
                 if (!mounted) return;
                 setState(() {
                   user_list = results_list;
@@ -92,7 +93,7 @@ class _SearchTabState extends State<SearchTab> {
                   } else {
                     trailingIcon = GestureDetector(
                       onTap: () async {
-                        final success = await SocialService.sendFriendRequest(
+                        final success = await SocialService(Client()).sendFriendRequest(
                           user["id"],
                         );
                         if (success) {

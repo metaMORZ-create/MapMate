@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:map_mates/services/social_service.dart';
 
 class DenyFriendButton extends StatelessWidget {
@@ -15,7 +16,7 @@ class DenyFriendButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        final success = await SocialService.denyFriendRequest(userId);
+        final success = await SocialService(Client()).denyFriendRequest(userId);
         if (success) {
           onAccepted(); // ruft setState im Parent auf
         }

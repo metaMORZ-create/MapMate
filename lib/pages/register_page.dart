@@ -1,3 +1,4 @@
+import "package:http/http.dart";
 import "package:map_mates/pages/home_page.dart";
 import "package:flutter/material.dart";
 import "package:map_mates/services/login_register_service.dart";
@@ -21,7 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final username = _usernameController.text.trim();
       final password = _passwordController.text.trim();
       // Login überprüfen und ggf. weiterleiten
-      final success = await LoginRegisterService.register(email, username, password);
+      final success = await LoginRegisterService(Client()).register(email, username, password);
       if (success) {
         Navigator.pushReplacement(
           context,

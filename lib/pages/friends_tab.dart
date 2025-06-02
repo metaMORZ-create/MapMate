@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:http/http.dart";
 import "package:map_mates/pages/area_map.dart";
 import "package:map_mates/services/social_service.dart";
 
@@ -20,7 +21,7 @@ class _FriendsTabState extends State<FriendsTab> {
   }
 
   Future<void> loadData() async {
-    final friends = await SocialService.getFriends();
+    final friends = await SocialService(Client()).getFriends();
     if (!mounted) return; 
     setState(() {
       friendsList = friends;
