@@ -2,6 +2,7 @@ import "package:http/http.dart";
 import "package:map_mates/pages/home_page.dart";
 import "package:flutter/material.dart";
 import "package:map_mates/services/login_register_service.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,10 +20,21 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final username = _usernameController.text.trim();
       final password = _passwordController.text.trim();
-      // Login überprüfen und ggf. weiterleiten
-      final success = await LoginRegisterService(
-        Client(),
-      ).login(username, password);
+
+      bool success;
+      if (const bool.fromEnvironment('TEST_MODE')) {
+        // Simuliere erfolgreichen Login
+        success = true;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool("loggedIn", true);
+        await prefs.setInt("user_id", 1);
+      } else {
+        // Echter Login
+        success = await LoginRegisterService(
+          Client(),
+        ).login(username, password);
+      }
+
       if (!mounted) return;
       if (success) {
         Navigator.pushReplacement(
@@ -42,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(25),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -53,7 +65,6 @@ class _LoginPageState extends State<LoginPage> {
               Form(
                 key: _formKey,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextFormField(
                       controller: _usernameController,

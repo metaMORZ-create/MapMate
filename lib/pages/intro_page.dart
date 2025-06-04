@@ -35,7 +35,10 @@ class _IntroPageState extends State<IntroPage> {
               // Start now button
               RegisterButton(permissionGranted: widget.permissionGranted),
               const SizedBox(height: 20),
-              LoginButton(permissionGranted: widget.permissionGranted),
+              LoginButton(
+                key: const Key('login_button'),
+                permissionGranted: widget.permissionGranted,
+              ),
             ],
           ),
         ),

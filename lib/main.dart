@@ -5,20 +5,27 @@ import 'package:map_mates/services/location_service.dart';
 import 'package:map_mates/services/location_tracker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {
+/// Wird durch `--dart-define=TEST_MODE=true` aktiviert
+const bool isTestMode = bool.fromEnvironment('TEST_MODE');
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await startApp();
+}
+
+Future<void> startApp() async {
   final prefs = await SharedPreferences.getInstance();
   final isLoggedIn = prefs.getBool("loggedIn") ?? false;
   final userId = prefs.getInt("user_id");
 
-  // Standortberechtigung abfragen
-  bool permissionGranted =
-      await LocationService.checkAndRequestLocationPermission();
+  // Standortberechtigung: im Testmodus automatisch gewähren
+  final permissionGranted =
+      isTestMode
+          ? true
+          : await LocationService.checkAndRequestLocationPermission();
 
-  // Automatische Polygon aktualisierung alle 5 Min
-  // Nur wenn eingeloggt: Tracking starten + Polygon-Update
-
-  if (isLoggedIn && userId != null) {
+  // Nur im echten Login-Fall Tracking starten
+  if (!isTestMode && isLoggedIn && userId != null) {
     await LocationTracker().startBatchTracking();
     await LocationTracker().updatePolygonOnce(userId);
     LocationTracker().startAutoPolygonUpdate(userId);
@@ -27,7 +34,7 @@ void main() async {
   runApp(MyApp(permissionGranted: permissionGranted, loggedIn: isLoggedIn));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   final bool permissionGranted;
   final bool loggedIn;
 
@@ -38,18 +45,13 @@ class MyApp extends StatefulWidget {
   });
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home:
-          widget.loggedIn
-              ? HomePage()
-              : IntroPage(permissionGranted: widget.permissionGranted),
+          loggedIn
+              ? const HomePage()
+              : IntroPage(permissionGranted: permissionGranted),
     );
   }
 }

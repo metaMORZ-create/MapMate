@@ -11,6 +11,7 @@ class ProfilesPage extends StatelessWidget {
     return DefaultTabController(
       length: 3, // Anzahl Tabs
       child: Scaffold(
+        key: Key("profiles_tabview"),
         backgroundColor: Colors.grey[300],
         appBar: AppBar(
           backgroundColor: Colors.grey[300],

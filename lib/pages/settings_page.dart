@@ -67,6 +67,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               GestureDetector(
+                key: const Key("logout_button"),
                 onTap: () async {
                   await LoginRegisterService(Client()).logout();
                   final permissionGranted =

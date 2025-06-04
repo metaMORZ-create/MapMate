@@ -19,9 +19,13 @@ class MyBottomNavBar extends StatelessWidget {
         tabBorderRadius: 16,
         onTabChange: (value) => onTabChange!(value),
         tabs: const [
-          GButton(icon: Icons.group, text: "Friends"),
-          GButton(icon: Icons.map, text: "Map"),
-          GButton(icon: Icons.settings, text: "Settings"),
+          GButton(icon: Icons.group, text: "Friends", key: Key("nav_friends")),
+          GButton(icon: Icons.map, text: "Map", key: Key("nav_map")),
+          GButton(
+            icon: Icons.settings,
+            text: "Settings",
+            key: Key("nav_settings"),
+          ),
         ],
       ),
     );

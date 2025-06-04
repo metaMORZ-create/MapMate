@@ -29,13 +29,20 @@ class _FriendsTabState extends State<FriendsTab> {
 
   @override
   Widget build(BuildContext context) {
+    if (friendsList.isEmpty) {
+      return const Center(
+        child: Text("Noch keine Freunde", key: Key("no_friends_text")),
+      );
+    }
+
     return ListView.builder(
-      padding: EdgeInsets.all(16),
+      key: const Key("friends_listview"),
+      padding: const EdgeInsets.all(16),
       itemCount: friendsList.length,
       itemBuilder: (context, index) {
         final friend = friendsList[index];
         return ListTile(
-          leading: Icon(Icons.person),
+          leading: const Icon(Icons.person),
           title: Text(friend["friend_username"]),
           subtitle: Text("ID: ${friend["friend_id"]}"),
           trailing: IconButton(
